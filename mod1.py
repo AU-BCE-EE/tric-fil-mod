@@ -2,7 +2,9 @@
 
 # Packages
 import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+import pdb
 
 # Set inputs
 L = 3     # Total length/height
@@ -19,7 +21,7 @@ cc = 0.0    # Initial concentration (g/m3)
 Q = 0.001   # m3/s
 
 # Reaction 
-k = 1E-5  # First-order 1/s
+k = 1.E-5  # First-order 1/s
 
 # Dirty air chemical concentration
 cin = 0.1 # g/m3
@@ -40,27 +42,30 @@ gv = dx * 1 * por
 
 # Compound conc and mass (g)
 # cc = concentration, mc = mass, dims -> rows are cells (position), columns have time [position, time]
-cc = np.full((nc, nts), cc)
-# NTS: can I do this in 1 step?
-mc = cc * np.transpose(np.tile(gv, (nts, 1)))
+cc = np.full((nc), cc)
+mc = cc * gv
 
-# Initial derivative array dm/dt [position]
-dm = np.zeros(nc)
-
-# Transport and reaction loop
-for t in range(1, nts) :
+# Rates function
+# Arg order: time, state variable, then arguments
+def rates(t, mc, Q, cin, gv, k):
+    
+    cc = mc / gv
+    dm = np.zeros(cc.shape[0])
     # First cell derivative
-    dm[0] = Q * (cin - cc[0, t-1]) - k * cc[0, t-1] 
+    dm[0] = Q * (cin - cc[0]) - k * cc[0] 
     # Others
-    dm[1:nc] = Q * - np.diff(cc[:, t-1]) - k * cc[1:nc, t-1]
-    # Update mass
-    mc[:, t] = mc[:, t-1] + dm * dt
-    # Concentrations
-    cc[:, t] = mc[:, t] / gv
-#    print(t)
-#    print(dm)
-#    print(cc[:, t])
+    dm[1:nc] = Q * - np.diff(cc) - k * cc[1:nc]
+    
+    return(dm)
 
-print(cc[9, :])
+# Solve/integrate
+out = solve_ivp(rates, [0, 86400], y0 = mc, t_eval = np.linspace(0, 24, 24) * 3600, 
+        args = (Q, cin, gv, k))
 
-#plt.plot(x, cc[:, 1]);plt.show()
+# Extract mass of compound [position, time]
+mct = out.y
+cct = mct / np.transpose(np.tile(gv, (mct.shape[1], 1)))
+
+plt.plot(x, cct[:, 1]);plt.show()
+plt.plot(x, cct[:, 23]);plt.show()
+

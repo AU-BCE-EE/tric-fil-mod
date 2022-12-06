@@ -14,9 +14,9 @@ def rates(t, mc, Q, cin, gv, k):
     nc = cc.shape[0]
     dm = np.zeros(cc.shape[0])
     # First cell derivative
-    dm[0] = Q * (cin - cc[0]) - k * cc[0] 
+    dm[0] = Q * (cin - cc[0]) - k * mc[0] 
     # Other cell derivatives
-    dm[1:nc] = Q * -np.diff(cc) - k * cc[1:nc]
+    dm[1:nc] = Q * -np.diff(cc) - k * mc[1:nc] # Check nc or nc - 1
     
     return dm
 
@@ -46,6 +46,7 @@ def tfmod(L, por, Q, nc, c0, cin, k, times):
     # cc = concentration, mc = mass [position]
     cc = np.full((nc), c0)
     mc = cc * gv
+
     
     # Solve/integrate
     out = solve_ivp(rates, [0, max(times)], y0 = mc, 

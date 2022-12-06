@@ -2,22 +2,23 @@
 
 # Packages
 import numpy as np
+import pdb
 from scipy.integrate import solve_ivp
-#import pdb
 
 # Rates function
 # Arg order: time, state variable, then arguments
 def rates(t, mc, Q, cin, gv, k):
     
+    #pdb.set_trace()
     cc = mc / gv
     nc = cc.shape[0]
     dm = np.zeros(cc.shape[0])
     # First cell derivative
     dm[0] = Q * (cin - cc[0]) - k * cc[0] 
-    # Others
+    # Other cell derivatives
     dm[1:nc] = Q * -np.diff(cc) - k * cc[1:nc]
     
-    return(dm)
+    return dm
 
 # Model function
 def tfmod(L, por, Q, nc, c0, cin, k, times):
@@ -36,7 +37,7 @@ def tfmod(L, por, Q, nc, c0, cin, k, times):
     # Create cells
     x = np.linspace(0, L, nc + 1)  # Original nc + 1 values
     dx = np.diff(x)[0]             # dx, single value
-    x = x[1:(nc + 1)] - dx / 2     # Center posit2ion in m
+    x = x[1:(nc + 1)] - dx / 2     # Center position in m
     
     # Cell gas volume (m3/m2)
     gv = dx * 1 * por 
@@ -55,4 +56,5 @@ def tfmod(L, por, Q, nc, c0, cin, k, times):
     mct = out.y
     cct = mct / np.transpose(np.tile(gv, (mct.shape[1], 1)))
     
+    # Return results as tuple
     return cct, mct, x, times

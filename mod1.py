@@ -2,7 +2,6 @@
 
 # Packages
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 #import pdb
 
@@ -11,6 +10,7 @@ from scipy.integrate import solve_ivp
 def rates(t, mc, Q, cin, gv, k):
     
     cc = mc / gv
+    nc = cc.shape[0]
     dm = np.zeros(cc.shape[0])
     # First cell derivative
     dm[0] = Q * (cin - cc[0]) - k * cc[0] 
@@ -20,7 +20,7 @@ def rates(t, mc, Q, cin, gv, k):
     return(dm)
 
 # Model function
-def tfmod(L, por, Q, nc, c0, cin, k):
+def tfmod(L, por, Q, nc, c0, cin, k, times):
 
     # L = total length/height (m)
     # por = gas phase porosity (m3/m3)
@@ -30,30 +30,29 @@ def tfmod(L, por, Q, nc, c0, cin, k):
     # cin = compound concentration in inflow (g/m3)
     # k = first-order reaction rate (1/s)
 
-    # Make sure cc is numeric to avoid integer crap
+    # Make sure cc is numeric to avoid integer math bug
     c0 = float(c0)
     
     # Create cells
-    x = np.linspace(0, L, nc + 1)  
-    dx = np.diff(x)                # dx
-    x = x[1:(nc + 1)] - dx / 2     # Center position in m
+    x = np.linspace(0, L, nc + 1)  # Original nc + 1 values
+    dx = np.diff(x)[0]             # dx, single value
+    x = x[1:(nc + 1)] - dx / 2     # Center posit2ion in m
     
     # Cell gas volume (m3/m2)
     gv = dx * 1 * por 
     
     # Compound conc and mass (g)
-    # cc = concentration, mc = mass, dims -> rows are cells (position), columns have time [position, time]
+    # cc = concentration, mc = mass [position]
     cc = np.full((nc), c0)
     mc = cc * gv
     
     # Solve/integrate
-    out = solve_ivp(rates, [0, 86400], y0 = mc, t_eval = np.linspace(0, 24, 24) * 3600, 
-            args = (Q, cin, gv, k))
+    out = solve_ivp(rates, [0, max(times)], y0 = mc, 
+                    t_eval = times, 
+                    args = (Q, cin, gv, k))
     
     # Extract mass of compound [position, time]
     mct = out.y
     cct = mct / np.transpose(np.tile(gv, (mct.shape[1], 1)))
     
-    plt.plot(x, cct[:, 1]);plt.show()
-    plt.plot(x, cct[:, 23]);plt.show()
-
+    return cct, mct, x, times

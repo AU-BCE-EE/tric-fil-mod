@@ -15,7 +15,7 @@ cin = 1          # Dirty air compound concentration (g/m3)
 k = 0.5 / 3600   # First-order degradation/removal rate (1/h -> 1/s)
 
 # Times for model run
-tt = 0.1 # hours
+tt = 0.2 # hours
 times = np.linspace(0, tt, 500) * 3600
 
 # From function def: tfmod(L, por, Q, nc, c0, cin, k, times)

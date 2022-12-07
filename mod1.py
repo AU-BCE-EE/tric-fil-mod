@@ -57,5 +57,5 @@ def tfmod(L, por, Q, nc, c0, cin, k, times):
     mct = out.y
     cct = mct / np.transpose(np.tile(gv, (mct.shape[1], 1)))
     
-    # Return results as tuple
+    # Return results as a tuple
     return cct, mct, x, times

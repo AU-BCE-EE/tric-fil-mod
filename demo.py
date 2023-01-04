@@ -24,7 +24,7 @@ tt = 2
 nt = 500
 times = np.linspace(0, tt, nt) * 3600
 
-from mod1 import tfmod
+from tfmod import tfmod
 
 # Sim 1 no reaction ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ka = 1E-3        # (m3/s)

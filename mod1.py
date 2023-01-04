@@ -1,4 +1,4 @@
-# Simple 1D diffusion model to start to think about reaction-transport models in Python
+# 1D 2-phase bio/chem air filter model in Python
 
 # Packages
 import numpy as np
@@ -15,11 +15,10 @@ def rates(t, mc, Q, cgin, vg, vl, k, ka, hc):
     nc = mc.shape[0] // 2
 
     # Separate gas and liquid state variables
-    # Note that moronic Python language starts at 0 and ends at position beyond end of array
     mcg = mc[0:nc]
     mcl = mc[nc:(2 * nc)]
 
-    # Concentrations (g/L)
+    # Concentrations (g/m3)
     ccg = mcg / vg
     ccl = mcl / vl
 
@@ -31,19 +30,22 @@ def rates(t, mc, Q, cgin, vg, vl, k, ka, hc):
     g2l = ka * (ccg - ccl / hc) 
 
     # Gas phase derivatives (g/s)
-    # cdiff = concentration difference (g/L)
-    cdiff = np.diff(np.insert(ccg, 0, cgin))
+    # cddiff = concentration double difference (g/m3)
+    cvec = np.insert(ccg, 0, cgin)
+    advec = - Q * np.diff(cvec)
     #     gas flow in    mt
-    dmg = Q * - cdiff - g2l
+    dmg = advec - g2l
 
     # Liquid phase derivatives (g/s)
-    #     mt  -reaction-
-    dml = g2l - k * mcl
+    rxn = k * mcl
+    dml = g2l - rxn
 
     # Combine gas and liquid
     dm = np.concatenate([dmg, dml])
 
-    #breakpoint()
+    #if t / 3600 > 0.05:
+    #    breakpoint()
+
     return dm
 
 # Model function
@@ -52,7 +54,7 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times):
     # L = total length/height (m)
     # gas = gas phase porosity (m3/m3)
     # liq = liquid phase content (m3/m3)
-    # Q = gas flow rate (m3/s)
+    # Q = gas flow rate (m3/m2-s)
     # nc = number of cells (layers)
     # cg0 = initial compound concentration in gas phase (g/m3)
     # cl0 = initial compound concentration in liquid phase (g/m3)
@@ -62,6 +64,8 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times):
     # henry = Henry's law constant coefficients as [k_H at 25 C, d(ln(kH)) / d(1/T)] as in NIST web book
     # temp = temperature (degrees C)
     # dens = solution (liquid) density (kg/m3)
+
+    rt = L * gas / Q
 
     R = 0.083144 # L bar / K-mol
     
@@ -76,7 +80,7 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times):
     # Temperature and Henry's law constant
     TK = temp + 273.15
     kh = henry[0] * math.exp(henry[1] * (1/TK - 1/298.15)) # mol/kg-bar as liq:gas
-    kh = kh * dens # mol/L-bar
+    kh = kh * dens / 1000 # mol/L-bar
     hc = kh * R * TK # dimensionless, liq:gas, e.g., g/L / g/L
     
     # Create cells
@@ -115,4 +119,4 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times):
     mct = np.concatenate([mcgt, mclt])
     
     # Return results as a tuple
-    return ccgt, cclt, mcgt, mclt, x, times
+    return ccgt, cclt, mcgt, mclt, x, times, rt

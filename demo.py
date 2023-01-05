@@ -1,6 +1,5 @@
 # Demo of Python air filter model
 
-import pdb
 import numpy as np
 import matplotlib.pyplot as plt
 

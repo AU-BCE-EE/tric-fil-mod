@@ -27,16 +27,18 @@ def rates(t, mc, Q, cgin, vg, vl, k, ka, hc):
     dmg = dml = g2l = np.zeros(nc)
 
     # Common term, mt into liquid phase (g/s)
+    # NTS check units
     g2l = ka * (ccg - ccl / hc) 
 
     # Gas phase derivatives (g/s)
     # cddiff = concentration double difference (g/m3)
+    # cvec = array of cell concentrations with inlet air added
     cvec = np.insert(ccg, 0, cgin)
     advec = - Q * np.diff(cvec)
-    #     gas flow in    mt
     dmg = advec - g2l
 
     # Liquid phase derivatives (g/s)
+    # NTS think about mass versus conc state variable
     rxn = k * mcl
     dml = g2l - rxn
 
@@ -60,6 +62,7 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times):
     # cl0 = initial compound concentration in liquid phase (g/m3)
     # cgin = compound concentration in inflow (g/m3)
     # ka = mass transfer coefficient for gas -> liquid (g/s / (g/m3) -> m3/s)
+    # NTS: should area be specific as m2/m3 giving ka in 1/s???
     # k = first-order liquid phase reaction rate constant (1/s)
     # henry = Henry's law constant coefficients as [k_H at 25 C, d(ln(kH)) / d(1/T)] as in NIST web book
     # temp = temperature (degrees C)
@@ -70,6 +73,7 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times):
     R = 0.083144 # L bar / K-mol
     
     # Make sure some inputs are numeric to avoid integer math bug
+    # NTS check also for henry
     cg0 = float(cg0)
     cl0 = float(cl0)
     cgin = float(cgin)
@@ -101,7 +105,7 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times):
     mcg = ccg * vg
     mcl = ccl * vl
 
-    # Initial state variable array (Python language is terrible)
+    # Initial state variable array
     y0 = np.concatenate([mcg, mcl])
     
     # Solve/integrate

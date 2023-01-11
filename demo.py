@@ -26,24 +26,24 @@ times = np.linspace(0, tt, nt) * 3600
 from tfmod import tfmod
 
 # Sim 1 no reaction ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ka = 1E-3        # (m3/s)
+Kga = 1E-3       # (1/s)
 k = 0. / 3600    # First-order degradation/removal rate (1/h -> 1/s)
-pred1 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times)
+pred1 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times)
 
 # Sim 2 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ka = 1E-3        # (m3/s)
+Kga = 1E-3       # (1/s)
 k = 1. / 3600    # First-order degradation/removal rate (1/h -> 1/s)
-pred2 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times)
+pred2 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times)
 
 # Sim 3 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ka = 1E-3        # (m3/s)
+Kga = 1E-3       # (1/s)
 k = 10. / 3600   # First-order degradation/removal rate (1/h -> 1/s)
-pred3 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times)
+pred3 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times)
 
 # Sim 4 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ka = 1E-5        # (m3/s)
+Kga = 1E-5       # (1/s)
 k = 10. / 3600   # First-order degradation/removal rate (1/h -> 1/s)
-pred4 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times)
+pred4 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times)
 
 # Plot outlet concentration (= 1 - removal efficiency here)
 # Gas concentration (exhaust) 

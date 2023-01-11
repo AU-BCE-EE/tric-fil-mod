@@ -1,52 +1,64 @@
 # Demo of Python air filter model
 
+# Import necessary packages
+import shutil
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Set model inputs
-L = 2
-gas = 0.5        #  (m3/m3)
-liq = 0.25       #  (m3/m3)
+# Import our model
+# Easiest if we have the module in this directory, so first the current version is copied in
+# We will probably come up with something more sophisticated eventually
+shutil.copy('../../tfmod.py', '.')
+from tfmod import tfmod
+
+# Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+L = 2            # Filter length/depth (m)
+gas = 0.5        # (m3/m3)
+liq = 0.25       # (m3/m3)
 Q = 0.001        # Air flow (m3/s)
 nc = 8           # Number of model cells (layers)
 cg0 = 0          # (g/m3)
 cl0 = 0          # (g/m3)
-cgin = 1         # Dirty air compound concentration (g/L)
+cgin = 1         # Dirty air compound concentration (g/m3)
 henry = (0.1, 2000.)
-temp = 15
-dens = 1000
+temp = 15        # (degrees C)
+dens = 1000      # Liquid density (kg/m3)
 
-# Times for model run
+Kga = 1E-3       # Mass transfer coefficient (1/s)
+k = 0. / 3600    # First-order degradation/removal rate (1/h -> 1/s)
+
+# Times for model output, calculated from tt and nt here but could be set directly
 # Total duration (hours)
 tt = 2 
 # Number of time rows
 nt = 500
 times = np.linspace(0, tt, nt) * 3600
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from tfmod import tfmod
-
-# Sim 1 no reaction ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Kga = 1E-3       # (1/s)
-k = 0. / 3600    # First-order degradation/removal rate (1/h -> 1/s)
+# Scenarios ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Sim 1 no reaction ~~~~~
+Kga = 1E-3 
+k = 0. / 3600
 pred1 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times)
 
-# Sim 2 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Kga = 1E-3       # (1/s)
-k = 1. / 3600    # First-order degradation/removal rate (1/h -> 1/s)
+# Sim 2 ~~~~~~~~~~~~~~~~~
+Kga = 1E-3
+k = 1. / 3600
 pred2 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times)
 
-# Sim 3 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Kga = 1E-3       # (1/s)
-k = 10. / 3600   # First-order degradation/removal rate (1/h -> 1/s)
+# Sim 3 ~~~~~~~~~~~~~~~~~
+Kga = 1E-3
+k = 10. / 3600
 pred3 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times)
 
-# Sim 4 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Sim 4 ~~~~~~~~~~~~~~~~~
 Kga = 1E-5       # (1/s)
 k = 10. / 3600   # First-order degradation/removal rate (1/h -> 1/s)
 pred4 = tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times)
 
-# Plot outlet concentration (= 1 - removal efficiency here)
-# Gas concentration (exhaust) 
+# Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Plot outlet concentration (= 1 - removal efficiency here because cgin = 1)
+# Gas concentration (outlet air) 
 plt.plot(pred1[5] / 3600, pred1[0][nc - 1, :])
 plt.plot(pred2[5] / 3600, pred2[0][nc - 1, :])
 plt.plot(pred3[5] / 3600, pred3[0][nc - 1, :])
@@ -85,5 +97,3 @@ plt.plot(pred4[4], pred4[1][:, nt - 1])
 plt.xlabel('Location (m)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.savefig('profile_liq_conc.png')
-
-print(pred1[6] / 3600)

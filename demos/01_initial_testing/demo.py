@@ -1,11 +1,11 @@
 # Demo of Python air filter model
 
-# Import necessary packages
+# Import necessary packages ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import shutil
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Import our model
+# Import our model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Easiest if we have the module in this directory, so first the current version is copied in
 # We will probably come up with something more sophisticated eventually
 shutil.copy('../../tfmod.py', '.')

@@ -74,13 +74,13 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times):
     R = 0.083144 
     
     # Make sure some inputs are numeric to avoid integer math bug
-    # NTS Also apply to henry
     cg0 = float(cg0)
     cl0 = float(cl0)
     cgin = float(cgin)
     ka = float(ka)
     k = float(k)
     temp = float(temp)
+    henry = np.array(henry).astype(float)
 
     # Temperature and Henry's law constant
     TK = temp + 273.15
@@ -115,7 +115,8 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, ka, k, henry, temp, dens, times):
     # Solve/integrate
     out = solve_ivp(rates, [0, max(times)], y0 = y0, 
                     t_eval = times, 
-                    args = (Q, cgin, vg, vl, vt, k, ka, hc))
+                    args = (Q, cgin, vg, vl, vt, k, ka, hc),
+                    method = 'LSODA')
     
     # Extract mass of compound [position, time]
     mcgt = out.y[0:nc]

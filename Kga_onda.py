@@ -49,7 +49,7 @@ def Kga_onda(vars):
         ae * visc_l))**(2/3) * (visc_l/(rho_l * Dliq))**(-0.5) * (
         ssa*dp)**0.4 * (rho_l/(visc_l*g))**(-1/3)
     
-    R = 0.08314  # Gas constant
+    R = 0.083144  # Gas constant (L bar / K-mol)
     Kaw = KH/(R*T) #  Neutral air-water distribution
     alpha = 1/(1+10**(pH - pKa))
     Daw = alpha*Kaw

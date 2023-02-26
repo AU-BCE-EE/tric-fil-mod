@@ -12,6 +12,7 @@ shutil.copy('../../tfmod.py', '.')
 from tfmod import tfmod
 
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# See notes in tfmod.py for more complete descriptions
 L = 2            # Filter length/depth (m)
 gas = 0.5        # (m3/m3)
 liq = 0.25       # (m3/m3)

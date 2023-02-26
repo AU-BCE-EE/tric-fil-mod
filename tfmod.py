@@ -28,7 +28,7 @@ def rates(t, mc, Q, cgin, vg, vl, vt, k, Kga, Kaw):
 
     # Common term, mass transfer into liquid phase (g/s)
     #g/s 1/s  m3(t) ----g/m3(g)-----
-    g2l = Kga * vt * (ccg - ccl / Kaw) 
+    g2l = Kga * vt * (ccg - ccl * Kaw) 
 
     # Gas phase derivatives (g/s)
     # cddiff = concentration double difference (g/m3)
@@ -86,7 +86,7 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times):
     TK = temp + 273.15
     kh = henry[0] * math.exp(henry[1] * (1/TK - 1/298.15)) # mol/kg-bar as liq:gas
     kh = kh * dens / 1000                                  # mol/L-bar
-    Kaw = kh * R * TK                                       # dimensionless, liq:gas, e.g., g/L / g/L
+    Kaw = 1 / (kh * R * TK)                                       # dimensionless, liq:gas, e.g., g/L / g/L
     
     # Create cells
     x = np.linspace(0, L, nc + 1)  # nc + 1 values

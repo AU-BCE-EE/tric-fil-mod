@@ -28,7 +28,7 @@ def rates(t, mc, Q, cgin, vg, vl, vt, k, Kga, Kaw):
 
     # Common term, mass transfer into liquid phase (g/s)
     #g/s 1/s  m3(t) ----g/m3(g)-----
-    g2l = Kga * vt * (ccg - ccl / Kaw) 
+    g2l = Kga * vt * (ccg - ccl * Kaw) 
 
     # Gas phase derivatives (g/s)
     # cddiff = concentration double difference (g/m3)
@@ -53,17 +53,21 @@ def rates(t, mc, Q, cgin, vg, vl, vt, k, Kga, Kaw):
 # Model function
 def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times):
 
+    # Note that units are defined per 1 m2 filter cross-sectional (total) area 
+    # Below, where 2 sets of units are given this applies to the first case
+    # For the second one, the cross-sectional area is used to normalize the unit
+    # The two are equivalent
     # L = total longitudinal length/height of reactor/filter (m)
-    # gas = gas phase porosity (m3/m3 = m3(g)/m3(t))
-    # liq = liquid phase content (m3/m3 = m3(l)/m3(t))
+    # gas = gas phase porosity (m3/m3 = m3(g)/m3(t) where g = gas and t = total)
+    # liq = liquid phase content (m3/m3 = m3(l)/m3(t) where l = liquid)
     # Q = gas flow rate (m3/s) (m3/m2-s = m3(g)/m2(t)-s)
     # nc = number of cells (layers)
-    # cg0 = initial compound concentration in gas phase (g/m3)
+    # cg0 = initial compound concentration in gas phase (g/m3 = g(compound)/m3(g))
     # cl0 = initial compound concentration in liquid phase (g/m3)
     # cgin = compound concentration in inflow (g/m3)
     # Kga = mass transfer coefficient for gas to liquid in gas phase units (1/s = g/s-m3(t) / g/m3(g))
     # k = first-order liquid phase reaction rate constant (1/s = g/s / g)
-    # henry = Henry's law constant coefficients as [k_H at 25 C, d(ln(kH)) / d(1/T)] as in NIST web book
+    # henry = Henry's law constant coefficients as [k_H at 25 C, d(ln(kH)) / d(1/T)] as in NIST Chemistry Web Book
     # temp = temperature (degrees C)
     # dens = solution (liquid) density (kg/m3)
 
@@ -86,14 +90,14 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times):
     TK = temp + 273.15
     kh = henry[0] * math.exp(henry[1] * (1/TK - 1/298.15)) # mol/kg-bar as liq:gas
     kh = kh * dens / 1000                                  # mol/L-bar
-    Kaw = kh * R * TK                                       # dimensionless, liq:gas, e.g., g/L / g/L
+    Kaw = 1 / (kh * R * TK)                                # dimensionless, gas:liq, e.g., g/L / g/L or g/m3 per g/m3
     
     # Create cells
     x = np.linspace(0, L, nc + 1)  # nc + 1 values
     dx = np.diff(x)[0]             # dx, single value, same for all cells
     x = x[1:(nc + 1)] - dx / 2     # Center position in m
     
-    # Cell volumes (m3) (m3/m2)
+    # Cell volumes (m3) (m3(g/l/t)/m2(t))
     # Total
     vt = dx * 1
     # Gas

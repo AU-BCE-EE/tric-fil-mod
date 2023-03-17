@@ -7,7 +7,7 @@ from scipy.integrate import solve_ivp
 
 # Rates function
 # Arg order: time, state variable, then arguments
-def rates(t, mc, Q, cgin, vg, vl, vt, k, Kga, Kaw):
+def rates(t, mc, v_g, v_l, cgin, vol_gas, vol_liq, vol_tot, k, Kga, Kaw):
 
     #breakpoint()
     
@@ -19,8 +19,8 @@ def rates(t, mc, Q, cgin, vg, vl, vt, k, Kga, Kaw):
     mcl = mc[nc:(2 * nc)]
 
     # Concentrations (g/m3)
-    ccg = mcg / vg
-    ccl = mcl / vl
+    ccg = mcg / vol_gas
+    ccl = mcl / vol_liq
 
     # Derivatives
     # Set up empty arrays
@@ -28,19 +28,25 @@ def rates(t, mc, Q, cgin, vg, vl, vt, k, Kga, Kaw):
 
     # Common term, mass transfer into liquid phase (g/s)
     #g/s 1/s  m3(t) ----g/m3(g)-----
-    g2l = Kga * vt * (ccg - ccl * Kaw) 
+    g2l = Kga * vol_tot * (ccg - ccl * Kaw) 
 
     # Gas phase derivatives (g/s)
+    # No reaction in gas phase
     # cddiff = concentration double difference (g/m3)
     # cvec = array of cell concentrations with inlet air added
     cvec = np.insert(ccg, 0, cgin)
-    advec = - Q * np.diff(cvec)
+    advec = - v_g * np.diff(cvec)
     dmg = advec - g2l
 
     # Liquid phase derivatives (g/s)
-    # NTS think about mass versus conc state variable
+    # Includes transport and reaction
     rxn = k * mcl
-    dml = g2l - rxn
+    # NTS: where does liquid come from? Right now assumed to be pure with 0 below
+    #if t / 3600 > 0.05:
+    #      breakpoint()
+    cvec = np.insert(ccl, 0, 0)
+    advec = - v_l * np.diff(cvec)
+    dml = advec + g2l - rxn
 
     # Combine gas and liquid
     dm = np.concatenate([dmg, dml])
@@ -51,16 +57,17 @@ def rates(t, mc, Q, cgin, vg, vl, vt, k, Kga, Kaw):
     return dm
 
 # Model function
-def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times):
+def tfmod(L, gas, liq, v_g, v_l, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times):
 
-    # Note that units are defined per 1 m2 filter cross-sectional (total) area 
-    # Below, where 2 sets of units are given this applies to the first case
-    # For the second one, the cross-sectional area is used to normalize the unit
-    # The two are equivalent
+    ## Note that units are defined per 1 m2 filter cross-sectional (total) area 
+    ## Below, where 2 sets of units are given this applies to the first case
+    ## For the second one, the cross-sectional area is used to normalize the unit
+    ## The two are mathematically equivalent
     # L = total longitudinal length/height of reactor/filter (m)
     # gas = gas phase porosity (m3/m3 = m3(g)/m3(t) where g = gas and t = total)
     # liq = liquid phase content (m3/m3 = m3(l)/m3(t) where l = liquid)
-    # Q = gas flow rate (m3/s) (m3/m2-s = m3(g)/m2(t)-s)
+    # v_g = gas flow rate (m3/s) (m3/m2-s = m3(g)/m2(t)-s = superficial velocity in m/s)
+    # v_l = liquid flow rate (m3/s) (m3/m2-s = m3(g)/m2(t)-s = superficial velocity in m/s)
     # nc = number of cells (layers)
     # cg0 = initial compound concentration in gas phase (g/m3 = g(compound)/m3(g))
     # cl0 = initial compound concentration in liquid phase (g/m3)
@@ -72,7 +79,8 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times):
     # dens = solution (liquid) density (kg/m3)
 
     # Retention time (s)
-    rt = L * gas / Q
+    rt_gas = L * gas / v_g
+    rt_liq = L * liq / v_l
 
     # Ideal gas constant (L bar / K-mol)
     R = 0.083144 
@@ -99,19 +107,19 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times):
     
     # Cell volumes (m3) (m3(g/l/t)/m2(t))
     # Total
-    vt = dx * 1
+    vol_tot = dx * 1
     # Gas
-    vg = vt * gas 
+    vol_gas = vol_tot * gas 
     # Liquid
-    vl = vt * liq 
+    vol_liq = vol_tot * liq 
     
     # Compound conc (g/m3) and mass (g) (g/m2)
     # cc = concentration, mc = mass [position]
     # g = gas, l = liquid
     ccg = np.full((nc), cg0)
     ccl = np.full((nc), cl0)
-    mcg = ccg * vg
-    mcl = ccl * vl
+    mcg = ccg * vol_gas
+    mcl = ccl * vol_liq
 
     # Initial state variable array
     y0 = np.concatenate([mcg, mcl])
@@ -119,7 +127,7 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times):
     # Solve/integrate
     out = solve_ivp(rates, [0, max(times)], y0 = y0, 
                     t_eval = times, 
-                    args = (Q, cgin, vg, vl, vt, k, Kga, Kaw),
+                    args = (v_g, v_l, cgin, vol_gas, vol_liq, vol_tot, k, Kga, Kaw),
                     method = 'LSODA')
     
     # Extract mass of compound [position, time]
@@ -128,13 +136,13 @@ def tfmod(L, gas, liq, Q, nc, cg0, cl0, cgin, Kga, k, henry, temp, dens, times):
 
     # Get concentrations vs. time
     # Gas
-    ccgt = mcgt / np.transpose(np.tile(vg, (mcgt.shape[1], 1)))
+    ccgt = mcgt / np.transpose(np.tile(vol_gas, (mcgt.shape[1], 1)))
     # Liquid
-    cclt = mclt / np.transpose(np.tile(vl, (mclt.shape[1], 1)))
+    cclt = mclt / np.transpose(np.tile(vol_liq, (mclt.shape[1], 1)))
     # Total
-    cctt = mclt / np.transpose(np.tile(vt, (mclt.shape[1], 1)))
+    cctt = mclt / np.transpose(np.tile(vol_tot, (mclt.shape[1], 1)))
 
     mct = np.concatenate([mcgt, mclt])
     
     # Return results as a tuple
-    return ccgt, cclt, mcgt, mclt, x, times, rt
+    return ccgt, cclt, mcgt, mclt, x, times, rt_gas, rt_liq

@@ -41,4 +41,5 @@ def Kga_onda(pH, TK, KH, pKa, P, ssa, Qstd, Qliq, por, Ax):
     
     Rtot = 1/(kg*ae) + Daw/(kl*ae)
     Kga = 1/Rtot
+
     return Kga

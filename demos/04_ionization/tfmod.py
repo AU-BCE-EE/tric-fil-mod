@@ -130,6 +130,9 @@ def tfmod(L, gas, liq, v_g, v_l, nc, cg0, cl0, cgin, Kga, k, henry, pKa, pH, tem
 
     # Ionization fraction
     alpha = 1 / (1 + 10**(pKa - pH))
+    print(alpha)
+    print(pH)
+    print(pKa)
     
     # Solve/integrate
     out = solve_ivp(rates, [0, max(times)], y0 = y0, 

@@ -36,7 +36,7 @@ def Kga_onda(pH, TK, KH, pKa, P, ssa, Qstd, Qliq, por, Ax):
     
     R = 0.083144  # Gas constant (L bar / K-mol)
     Kaw = KH/(R*TK) #  Neutral air-water distribution
-    alpha = 1/(1+10**(pH - pKa))
+    alpha = 1 / (1 + 10**(pKa - pH))
     Daw = alpha*Kaw
     
     Rtot = 1/(kg*ae) + Daw/(kl*ae)

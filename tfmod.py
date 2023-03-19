@@ -7,7 +7,7 @@ from scipy.integrate import solve_ivp
 
 # Rates function
 # Arg order: time, state variable, then arguments
-def rates(t, mc, v_g, v_l, cgin, vol_gas, vol_liq, vol_tot, k, Kga, Kaw, alpha):
+def rates(t, mc, v_g, v_l, cgin, vol_gas, vol_liq, vol_tot, k, Kga, Daw):
 
     #breakpoint()
     
@@ -28,7 +28,7 @@ def rates(t, mc, v_g, v_l, cgin, vol_gas, vol_liq, vol_tot, k, Kga, Kaw, alpha):
 
     # Common term, mass transfer into liquid phase (g/s)
     #g/s 1/s  m3(t) ----g/m3(g)-----
-    g2l = Kga * vol_tot * (ccg - ccl / alpha * Kaw) 
+    g2l = Kga * vol_tot * (ccg - ccl * Daw) 
 
     # Gas phase derivatives (g/s)
     # No reaction in gas phase
@@ -129,12 +129,13 @@ def tfmod(L, gas, liq, v_g, v_l, nc, cg0, cl0, cgin, Kga, k, henry, pKa, pH, tem
     y0 = np.concatenate([mcg, mcl])
 
     # Ionization fraction
-    alpha = 1 / (1 + 10**(pKa - pH))
+    alpha0 = 1 / (1 + 10**(pH - pKa))
+    Daw = alpha0 * Kaw
     
     # Solve/integrate
     out = solve_ivp(rates, [0, max(times)], y0 = y0, 
                     t_eval = times, 
-                    args = (v_g, v_l, cgin, vol_gas, vol_liq, vol_tot, k, Kga, Kaw, alpha),
+                    args = (v_g, v_l, cgin, vol_gas, vol_liq, vol_tot, k, Kga, Daw),
                     method = 'LSODA')
     
     # Extract mass of compound [position, time]

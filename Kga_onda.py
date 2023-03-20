@@ -1,6 +1,6 @@
 import math
 
-def Kga_onda(pH, temp, henry, pKa, P, ssa, v_g, v_l, por_g):
+def Kga_onda(pH, temp, henry, pKa, P, ssa, v_g, v_l, por_g, dens_l):
 
     # Add conversion to numeric
    
@@ -20,7 +20,6 @@ def Kga_onda(pH, temp, henry, pKa, P, ssa, v_g, v_l, por_g):
         dp_emp = 5.23
 
     TK = temp + 273.15
-    KH = henry[0] * math.exp(henry[1] * (1 / TK - 1 / 298.15)) # mol / kg-bar as liq:gas
 
     rho_g = P * 28.97 / (0.08206 * TK) * 1000
     visc_g = 9.1e-8 * TK-1.16e-5   # empirical relation for gas viscosity vs TK
@@ -38,7 +37,9 @@ def Kga_onda(pH, temp, henry, pKa, P, ssa, v_g, v_l, por_g):
    
     kl = 0.0051 * (v_l * rho_l / (ae * visc_l))**(2/3) * (visc_l / (rho_l * Dliq))**(-0.5) * (ssa * dp)**0.4 * (rho_l / (visc_l * g))**(-1/3)
    
-    Kaw = KH / (R * TK) #  Neutral air-water distribution
+    kh = henry[0] * math.exp(henry[1] * (1/TK - 1/298.15)) # mol/kg-bar as liq:gas
+    kh = kh * dens_l / 1000                                # mol/L-bar
+    Kaw = 1 / (kh * R * TK)                                # Neutral air-water distribution
     # alpha 0 (fraction as uncharged species)
     alpha0 = 1 / (1 + 10**(pH - pKa))
     Daw = alpha0 * Kaw

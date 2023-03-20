@@ -7,7 +7,7 @@ from scipy.integrate import solve_ivp
 
 # Rates function
 # Arg order: time, state variable, then arguments
-def rates(t, mc, v_g, v_l, cgin, vol_gas, vol_liq, vol_tot, k, Kga, Daw):
+def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw):
 
     #breakpoint()
     
@@ -44,7 +44,7 @@ def rates(t, mc, v_g, v_l, cgin, vol_gas, vol_liq, vol_tot, k, Kga, Daw):
     # NTS: where does liquid come from? Right now assumed to be pure with 0 below
     #if t / 3600 > 0.05:
     #      breakpoint()
-    cvec = np.insert(ccl, 0, 0)
+    cvec = np.insert(ccl, 0, clin)
     advec = - v_l * np.diff(cvec)
     dml = advec + g2l - rxn
 

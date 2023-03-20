@@ -14,11 +14,11 @@ from tfmod import tfmod
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # See notes in tfmod.py for more complete descriptions
 L = 2            # Filter length/depth (m)
-gas = 0.5        # (m3/m3)
-liq = 0.25       # (m3/m3)
+por_g = 0.5      # (m3/m3)
+por_l = 0.25     # (m3/m3)
 v_g = 0.03       # Air flow (m/s)
 v_l = 2E-5       # Water flow (m/s)
-nc = 20          # Number of model cells (layers)
+nc = 30          # Number of model cells (layers)
 cg0 = 0          # (g/m3)
 cl0 = 0          # (g/m3)
 cgin = 1.        # Dirty air compound concentration (g/m3)
@@ -43,19 +43,19 @@ times = np.linspace(0, tt, nt) * 3600
 
 # Scenarios ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Sim 1 pH = pKa
-pred1 = tfmod(L = L, gas = gas, liq = liq, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
+pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, Kga = Kga, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens = dens, times = times)
 
 # Sim 2 low pH ~~~~~~~~~~~~~~~~~
 pH = 5
-pred2 = tfmod(L = L, gas = gas, liq = liq, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
+pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, Kga = Kga, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens = dens, times = times)
 
 # Sim 3 high pH ~~~~~~~~~~~~~~~~
 pH = 9
-pred3 = tfmod(L = L, gas = gas, liq = liq, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
+pred3 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, Kga = Kga, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens = dens, times = times)
 

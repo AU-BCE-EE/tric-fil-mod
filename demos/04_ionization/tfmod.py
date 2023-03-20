@@ -57,15 +57,15 @@ def rates(t, mc, v_g, v_l, cgin, vol_gas, vol_liq, vol_tot, k, Kga, Daw):
     return dm
 
 # Model function
-def tfmod(L, gas, liq, v_g, v_l, nc, cg0, cl0, cgin, Kga, k, henry, pKa, pH, temp, dens, times):
+def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, Kga, k, henry, pKa, pH, temp, dens, times):
 
     ## Note that units are defined per 1 m2 filter cross-sectional (total) area 
     ## Below, where 2 sets of units are given this applies to the first case
     ## For the second one, the cross-sectional area is used to normalize the unit
     ## The two are mathematically equivalent
     # L = total longitudinal length/height of reactor/filter (m)
-    # gas = gas phase porosity (m3/m3 = m3(g)/m3(t) where g = gas and t = total)
-    # liq = liquid phase content (m3/m3 = m3(l)/m3(t) where l = liquid)
+    # por_g = gas phase porosity (m3/m3 = m3(g)/m3(t) where g = gas and t = total)
+    # por_l = liquid phase content (m3/m3 = m3(l)/m3(t) where l = liquid)
     # v_g = gas flow rate (m3/s) (m3/m2-s = m3(g)/m2(t)-s = superficial velocity in m/s)
     # v_l = liquid flow rate (m3/s) (m3/m2-s = m3(g)/m2(t)-s = superficial velocity in m/s)
     # nc = number of cells (layers)
@@ -79,8 +79,8 @@ def tfmod(L, gas, liq, v_g, v_l, nc, cg0, cl0, cgin, Kga, k, henry, pKa, pH, tem
     # dens = solution (liquid) density (kg/m3)
 
     # Retention time (s)
-    rt_gas = L * gas / v_g
-    rt_liq = L * liq / v_l
+    rt_gas = L * por_g / v_g
+    rt_liq = L * por_l / v_l
 
     # Ideal gas constant (L bar / K-mol)
     R = 0.083144 
@@ -113,9 +113,9 @@ def tfmod(L, gas, liq, v_g, v_l, nc, cg0, cl0, cgin, Kga, k, henry, pKa, pH, tem
     # Total
     vol_tot = dx * 1
     # Gas
-    vol_gas = vol_tot * gas 
+    vol_gas = vol_tot * por_g 
     # Liquid
-    vol_liq = vol_tot * liq 
+    vol_liq = vol_tot * por_l 
     
     # Compound conc (g/m3) and mass (g) (g/m2)
     # cc = concentration, mc = mass [position]

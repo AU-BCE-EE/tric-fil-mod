@@ -1,6 +1,6 @@
 import math
 
-def Kga_onda(pH, temp, henry, pKa, P, ssa, v_g, v_l, por_g, dens_l):
+def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
 
     # Add conversion to numeric
    
@@ -21,7 +21,7 @@ def Kga_onda(pH, temp, henry, pKa, P, ssa, v_g, v_l, por_g, dens_l):
 
     TK = temp + 273.15
 
-    rho_g = P * 28.97 / (0.08206 * TK) * 1000
+    rho_g = pres * 28.97 / (0.08206 * TK) * 1000
     visc_g = 9.1e-8 * TK-1.16e-5   # empirical relation for gas viscosity vs TK
     visc_l = -2.55e-5 * TK + 8.51e-3
     rho_l = 1.0e6   # g / m3

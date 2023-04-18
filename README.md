@@ -1,5 +1,8 @@
 # tric-fil-mod
-Playing around with trickling filter model in Python
+A trickling filter model for gas treatment programmed in Python 3.
+Includes kinetically-limited transport between gas and aqueous phases, first-order liquid phase reaction, pH-dependent dissociation, and co- or countercurrent liquid flow.
+
+Model is currently under development.
 
 # Maintainer
 Sasha Hafner.

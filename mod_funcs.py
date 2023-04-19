@@ -13,8 +13,8 @@ def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
    
     # Hard-wired constants
     g = 9.81        # m / sec^2
-    Dg = 1.16e-5    # gas diffusion coefficient in m2 / sec; compound specific
-    Dliq = 1.89e-9  # liquid diffusion coefficient
+    Dg = 1.16E-5    # gas diffusion coefficient in m2 / sec; compound specific
+    Dliq = 1.89E-9  # liquid diffusion coefficient
     sigm_c = 0.75   # critical surface tension
     sigm_l = 0.0073 # surface tension
     R = 0.083144    # Gas constant (L bar / K-mol)
@@ -30,8 +30,8 @@ def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
     TK = temp + 273.15
 
     dens_g = pres * mw_g / (R * TK) # g/L = kg/m3
-    visc_g = 9.1e-8 * TK - 1.16e-5   # empirical relation for gas viscosity vs TK
-    visc_l = -2.55e-5 * TK + 8.51e-3
+    visc_g = 9.1E-8 * TK - 1.16E-5   # empirical relation for gas viscosity vs TK
+    visc_l = -2.55E-5 * TK + 8.51E-3
     Re = dens_l * v_l / (ssa * visc_l)
     Fr = v_l * v_l * ssa / g
     We = v_l * v_l * dens_l / (sigm_l * ssa)

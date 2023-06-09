@@ -14,7 +14,11 @@ Some R stuff.
 
 ```{r}
 library(reticulate)
-use_python('/usr/bin/python3')
+if(.Platform$OS.type == "windows") {
+  use_python('C:\\Users\\sasha\\AppData\\Local\\Programs\\Python\\Python311')
+} else {
+  use_python('/usr/bin/python3')  
+}
 ```
 
 # And now the Python model

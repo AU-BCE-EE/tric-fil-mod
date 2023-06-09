@@ -9,11 +9,34 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 Demonstration of time-variable inlet gas concentrations of target compound.
 This is done in R Markdown because there is no simple equivalent for Python and the reticulate package lets R do Python stuff.
 
+This file should work on Windows or Linux (although the location of the python executable will have to be manually set, annoyingly).
+
+# Steps on Windows
+## First time
+
+1. Install reticulate package in R
+2. Open this Rmd file in RStudio
+3. Set working directory to "source file location" (Session -> Set working dir -> Source file location)
+4. Set Python executable location in block below if it is not correct (Anders, you can change it permanently to your path below)
+5. "Knit" document
+
+## After that
+
+1. Open this Rmd file in RStudio
+2. Set working directory to "source file location" (Session -> Set working dir -> Source file location)
+3. "Knit" document
+
 # R prep
 Some R stuff.
 
 ```{r}
 library(reticulate)
+```
+
+```{r}
+# Find python executable
+system('where python')
+
 if(.Platform$OS.type == "windows") {
   use_python('C:\\Users\\sasha\\AppData\\Local\\Programs\\Python\\Python311')
 } else {
@@ -90,6 +113,12 @@ k = 0.
 pred3 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
+```
+
+Check Kga
+
+```{python}
+pred2[8]
 ```
 
 Plots

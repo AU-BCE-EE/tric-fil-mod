@@ -37,7 +37,6 @@ pKa = 7.
 cgin = pd.DataFrame({'time': [0, 1000, 1100, 3600, 3700, 5000, 7200], 
                      'cgin': [1, 3, 1, 1, 4, 2, 2]})
 
-cgin = '12'
 # Fixed for water
 clin = 0.        # Fresh water concentration (g/m3)
 
@@ -72,19 +71,19 @@ pred3 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc,
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Plot outlet concentration (= 1 - removal efficiency here because cgin = 1)
 # Gas concentration (outlet air) 
-plt.plot(pred1[5] / 3600, pred1[0][nc - 1, :], 'r-')
-plt.plot(pred2[5] / 3600, pred2[0][nc - 1, :], 'b')
-plt.plot(pred3[5] / 3600, pred3[0][nc - 1, :], 'g-')
-plt.plot(pred3[5] / 3600, pred3[0][0, :], 'orange', linestyle = 'dashed')
+plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], 'r-')
+plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :], 'b')
+plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], 'g-')
+plt.plot(pred3['time'] / 3600, pred3['gas_conc'][0, :], 'orange', linestyle = 'dashed')
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.savefig('outlet_gas_conc.png')
 
 # Liquid concentration (in last layer)
 plt.clf()
-plt.plot(pred1[5] / 3600, pred1[1][nc - 1, :], 'r-')
-plt.plot(pred2[5] / 3600, pred2[1][nc - 1, :], 'b')
-plt.plot(pred3[5] / 3600, pred3[1][nc - 1, :], 'g-')
+plt.plot(pred1['time'] / 3600, pred1['liq_conc'][nc - 1, :], 'r-')
+plt.plot(pred2['time'] / 3600, pred2['liq_conc'][nc - 1, :], 'b')
+plt.plot(pred3['time'] / 3600, pred3['liq_conc'][nc - 1, :], 'g-')
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.savefig('outlet_liq_conc.png')
@@ -92,18 +91,23 @@ plt.savefig('outlet_liq_conc.png')
 # Profiles
 # Gas
 plt.clf()
-plt.plot(pred1[4], pred1[0][:, nt - 1], 'r-')
-plt.plot(pred2[4], pred2[0][:, nt - 1], 'b')
-plt.plot(pred3[4], pred3[0][:, nt - 1], 'g-')
+plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, nt - 1], 'r-')
+plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, nt - 1], 'b')
+plt.plot(pred3['cell_pos'], pred3['gas_conc'][:, nt - 1], 'g-')
 plt.xlabel('Location (m)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.savefig('profile_gas_conc.png')
 
 # Liquid
 plt.clf()
-plt.plot(pred1[4], pred1[1][:, nt - 1], 'r-')
-plt.plot(pred2[4], pred2[1][:, nt - 1], 'b')
-plt.plot(pred3[4], pred3[1][:, nt - 1], 'g-')
+plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, nt - 1], 'r-')
+plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, nt - 1], 'b')
+plt.plot(pred3['cell_pos'], pred3['liq_conc'][:, nt - 1], 'g-')
 plt.xlabel('Location (m)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.savefig('profile_liq_conc.png')
+
+# Check Kga
+print('Kga pred1: ', pred1['Kga'])
+print('Kga pred2: ', pred2['Kga'])
+print('Kga pred3: ', pred3['Kga'])

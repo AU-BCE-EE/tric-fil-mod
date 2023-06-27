@@ -231,4 +231,4 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
    mct = np.concatenate([mcgt, mclt])
    
    # Return results as a tuple
-   return ccgt, cclt, mcgt, mclt, x, times, rt_gas, rt_liq, Kga
+   return {'gas_conc': ccgt, 'liq_conc': cclt, 'gas_mass': mcgt, 'liq_mass': mclt, 'cell_pos': x, 'time': times, 'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga}

@@ -242,9 +242,9 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
 
    mct = np.concatenate([mcgt, mclt])
    
-   # Return results as a tuple
+   # Return results as a dictionary
    return {'gas_conc': ccgt, 'liq_conc': cclt, 'gas_mass': mcgt, 'liq_mass': mclt, 
            'cell_pos': x, 'time': times, 
            'inputs': args_in, 
-           'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga, 'Kaw': Kaw}
+           'pars': {'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga, 'Kaw': Kaw, 'alpha0': alpha0, 'Daw': Daw}}
 

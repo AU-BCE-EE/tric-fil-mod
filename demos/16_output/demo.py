@@ -56,6 +56,10 @@ pred1['inputs']['por_g']
 
 print(pred1['inputs']['por_g'])
 
+# Check some pars
+print(pred1['pars'])
+print(pred1['pars']['Kaw'])
+
 
 
 

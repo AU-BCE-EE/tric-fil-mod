@@ -6,13 +6,11 @@ import math
 import pandas as pd
 import sys
 from scipy.integrate import solve_ivp 
-#test from Anne
+
 # Mass transfer coefficient function
 # See tfmod function for units on inputs
 def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
 
-    # Add conversion to numeric
-   
     # Hard-wired constants
     g = 9.81        # m / sec^2
     Dg = 1.16E-5    # gas diffusion coefficient in m2 / sec; compound specific

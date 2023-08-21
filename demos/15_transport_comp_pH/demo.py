@@ -111,6 +111,3 @@ plt.xlabel('Location (m)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.savefig('profile_liq_conc.png')
 
-```
-python3 demo.py
-```

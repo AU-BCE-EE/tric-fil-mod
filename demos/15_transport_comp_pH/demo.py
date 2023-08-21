@@ -110,3 +110,7 @@ plt.plot(pred4['cell_pos'], pred4['liq_conc'][:, nt - 1], 'orange')
 plt.xlabel('Location (m)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.savefig('profile_liq_conc.png')
+
+```
+python3 demo.py
+```

@@ -14,12 +14,12 @@ from Annes_Playground_mod_funcs import tfmod
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # See notes in tfmod.py for more complete descriptions
 L = 0.51            # Filter length/depth (m) 
-por_g = 0.5      # (m3/m3) TBD
-por_l = 0.25     # (m3/m3) TBD
+por_g = 0.80      # (m3/m3) Estimated by volume calculations
+por_l = 0.018     # (m3/m3) Estimated by volume calculations
 v_g = 0.017       #not relevant
 v_l = 1E-4        #not relevant
 nc = 200          # Number of model cells (layers)
-cg0 = 0.0086          # (g/m3)
+cg0 = 0          # (g/m3)
 cl0 = 0          # (g/m3)
 henry = (0.1, 2000.)
 temp = 21.       # (degrees C)
@@ -28,7 +28,7 @@ dens_l = 1000    # Liquid density (kg/m3)
 k = 0        # Reaction rate (1/s). Small because of inert carrier
                  # Reaction could be acid/base that changes the pH
 
-pH = 7.
+pH = 6.
 
 # realistic pKa
 pKa = 7.

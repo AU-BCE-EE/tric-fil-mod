@@ -58,7 +58,7 @@ def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
 
 # Rates function
 # Arg order: time, state variable, then arguments
-def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, counter = False, recirc = False):
+def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, counter = True, recirc = False):
 
   # If time-variable concentrations coming in are given, get interpolated values
   if type(clin) is pd.core.frame.DataFrame:
@@ -116,7 +116,7 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, c
   # Liquid phase derivatives (g/s)
   # Includes transport and reaction
   rxn = k * mcl
-  if not counter:
+  if counter==True:
      cvec = np.insert(ccl, 0, clin)
   else:
      v_l = - v_l

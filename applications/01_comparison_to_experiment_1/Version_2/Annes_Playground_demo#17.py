@@ -8,7 +8,7 @@ import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from Annes_Playground_mod_funcs import tfmod  
+from Annes_Playground_mod_funcs_2 import tfmod  
 
 
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -16,8 +16,8 @@ from Annes_Playground_mod_funcs import tfmod
 L = 0.51            # Filter length/depth (m) 
 por_g = 0.80      # (m3/m3) Estimated by volume calculations
 por_l = 0.018     # (m3/m3) Estimated by volume calculations
-v_g = 0.017       #not relevant
-v_l = 1E-4        #not relevant
+v_g = 0.017       #not relevant as this is entered manually
+v_l = 1E-4        #not relevant as this is entered manually
 nc = 200          # Number of model cells (layers)
 cg0 = 0          # (g/m3)
 cl0 = 0          # (g/m3)
@@ -93,37 +93,45 @@ ct = ctin * np.exp(-k  * por_l / (v_g * Kaw) * z)
 cg = Kaw * ct / (por_g * Kaw + por_l)
 cl = cg / Kaw
 
+
+
+## Breakthrough time calculated from volume (V=14.5L), Por_g=0.8 and volumetric velocities 25l/min (v_g=53m/h) 
+# and 50 L/min (v_g=106m/h)
+
+BT1 = 14.5*por_g/50
+BT2 = 14.5*por_g/25
+
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Profiles
 # Gas
-plt.clf()
-plt.plot(z, cg, 'bo')
-plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, nt - 1], color='b',label='v_g=53m/h, v_l=0.4m/h')
-plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, nt - 1], color='r',label='v_g=106m/h, v_l=0.4m/h')
-plt.plot(pred3['cell_pos'], pred3['gas_conc'][:, nt - 1], color='y',label='v_g=106m/h, v_l=1.2m/h')
-plt.plot(pred4['cell_pos'], pred4['gas_conc'][:, nt - 1], color = 'k',label='v_g=53m/h, v_l=1.2m/h')
-plt.plot(pred5['cell_pos'], pred1['gas_conc'][:, nt - 1], color='c',label='v_g=53m/h, v_l=0.8m/h')
-plt.plot(pred6['cell_pos'], pred1['gas_conc'][:, nt - 1], color='m',label='v_g=106m/h, v_l=0.8m/h')
-plt.xlabel('Location (m)')
-plt.ylabel('Compound conc. (g/m3)')
-plt.title('Gas Phase')
-plt.legend()
-plt.show()
+#plt.clf()
+#plt.plot(z, cg, 'bo')
+#plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, nt - 1], color='b',label='v_g=53m/h, v_l=0.4m/h')
+#plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, nt - 1], color='r',label='v_g=106m/h, v_l=0.4m/h')
+#plt.plot(pred3['cell_pos'], pred3['gas_conc'][:, nt - 1], color='y',label='v_g=106m/h, v_l=1.2m/h')
+#plt.plot(pred4['cell_pos'], pred4['gas_conc'][:, nt - 1], color = 'k',label='v_g=53m/h, v_l=1.2m/h')
+#plt.plot(pred5['cell_pos'], pred1['gas_conc'][:, nt - 1], color='c',label='v_g=53m/h, v_l=0.8m/h')
+#plt.plot(pred6['cell_pos'], pred1['gas_conc'][:, nt - 1], color='m',label='v_g=106m/h, v_l=0.8m/h')
+#plt.xlabel('Location (m)')
+#plt.ylabel('Compound conc. (g/m3)')
+#plt.title('Gas Phase')
+#plt.legend()
+#plt.show()
 
 # Liquid
-plt.clf()
-plt.plot(z, cl, 'bo')
-plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, nt - 1], color='b',label='v_g=53m/h, v_l=0.4m/h')
-plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, nt - 1], color='r',label='v_g=106m/h, v_l=0.4m/h')
-plt.plot(pred3['cell_pos'], pred3['liq_conc'][:, nt - 1], color='y',label='v_g=106m/h, v_l=1.2m/h')
-plt.plot(pred4['cell_pos'], pred4['liq_conc'][:, nt - 1], color = 'k',label='v_g=53m/h, v_l=1.2m/h')
-plt.plot(pred5['cell_pos'], pred1['liq_conc'][:, nt - 1], color='c',label='v_g=53m/h, v_l=0.8m/h')
-plt.plot(pred6['cell_pos'], pred1['liq_conc'][:, nt - 1], color='m',label='v_g=106m/h, v_l=0.8m/h')
-plt.xlabel('Location (m)')
-plt.ylabel('Compound conc. (g/m3)')
-plt.title('Liquid Phase')
-plt.legend()
-plt.show()
+#plt.clf()
+#plt.plot(z, cl, 'bo')
+#plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, nt - 1], color='b',label='v_g=53m/h, v_l=0.4m/h')
+#plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, nt - 1], color='r',label='v_g=106m/h, v_l=0.4m/h')
+#plt.plot(pred3['cell_pos'], pred3['liq_conc'][:, nt - 1], color='y',label='v_g=106m/h, v_l=1.2m/h')
+#plt.plot(pred4['cell_pos'], pred4['liq_conc'][:, nt - 1], color = 'k',label='v_g=53m/h, v_l=1.2m/h')
+#plt.plot(pred5['cell_pos'], pred1['liq_conc'][:, nt - 1], color='c',label='v_g=53m/h, v_l=0.8m/h')
+#plt.plot(pred6['cell_pos'], pred1['liq_conc'][:, nt - 1], color='m',label='v_g=106m/h, v_l=0.8m/h')
+#plt.xlabel('Location (m)')
+#plt.ylabel('Compound conc. (g/m3)')
+#plt.title('Liquid Phase')
+#plt.legend()
+#plt.show()
 
 #Outlet concentrations as function of time
 #Gas
@@ -133,6 +141,8 @@ plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], color='y',label='v_
 plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :], color = 'k',label='v_g=53m/h, v_l=1.2m/h')
 plt.plot(pred5['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='c',label='v_g=53m/h, v_l=0.8m/h')
 plt.plot(pred6['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='m',label='v_g=106m/h, v_l=0.8m/h')
+plt.axvline(x=BT1/60,color='r',linestyle='-')
+plt.axvline(x=BT2/60,color='b',linestyle='-')
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
@@ -151,3 +161,10 @@ plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
 plt.title('Liquid Phase')
 plt.show()
+
+
+
+
+
+
+

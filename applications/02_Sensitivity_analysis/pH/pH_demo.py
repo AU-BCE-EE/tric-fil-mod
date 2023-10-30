@@ -13,12 +13,12 @@ from Mod_funcs import tfmod
 
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # See notes in tfmod.py for more complete descriptions
-L =1            # Filter length/depth (m) (actual 0.51, changed to be able to tell graphs apart)
+L =0.51            # Filter length/depth (m) (actual 0.51, changed to be able to tell graphs apart)
 por_g = 0.80      # (m3/m3) Estimated by volume calculations
-por_l = 0.2       # (m3/m3) Estimated at 0.018, changed to be able to tell the graphs apart
+por_l = 0.018       # (m3/m3) Estimated at 0.018, changed to be able to tell the graphs apart
 v_g = 75/3600       # superficial gas velocity m/s (approx. middle of ex1)
 v_l = 0.8/3600        #liquid superficial velocity m/s (approx middle of ex1)
-nc = 200          # Number of model cells (layers)
+nc = 100          # Number of model cells (layers)
 cg0 = 0          # (g/m3)
 cl0 = 0          # (g/m3)
 henry = (0.1, 2000.)

@@ -225,6 +225,7 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
                    t_eval = times, 
                    args = (v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, counter),
                    method = 'LSODA')
+   # Set max_step=0.1 as last argument in the solver to get smooth curves that take longer time to simulate
    
    # Extract mass of compound [position, time]
    mcgt = out.y[0:nc]

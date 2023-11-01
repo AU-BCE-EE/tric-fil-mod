@@ -163,7 +163,16 @@ plt.title('Liquid Phase')
 plt.show()
 
 
-
+#comparison to data
+from Data_treatment_v1 import t
+from Data_treatment_v1 import C_out
+plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='b',label='model')
+plt.plot(t,C_out,label='experimental data')
+plt.xlabel('Time (h)')
+plt.ylabel('Compound conc. (g/m3)')
+plt.legend()
+plt.title('Gas Phase')
+plt.show()
 
 
 

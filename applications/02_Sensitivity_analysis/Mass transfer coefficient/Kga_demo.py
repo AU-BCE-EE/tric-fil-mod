@@ -25,7 +25,7 @@ henry = (0.1, 2000.)
 temp = 21.       # (degrees C)
 dens_l = 1000    # Liquid density (kg/m3)
 
-k = 0        # Reaction rate (1/s). Small because of inert carrier
+k = 1        # Reaction rate (1/s). Small because of inert carrier
                  #changed later in code
                  # order of magnitude estimate: From Andreas Gravholts thesis page 38: k=0.07h^-1=2E-5s^-1. 
                  
@@ -51,35 +51,35 @@ times = np.linspace(0, tt, nt) * 3600
 
 # Scenarios ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-k=0
+
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 10, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
 Kaw1=pred1['Kaw']
 
 
-k=0.1
+
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 1, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
 
-k=10
+
 pred3 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 0.1, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
 
-k=100
+
 pred4 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 0.01, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
 
-k=10000
+
 pred5 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 0.001, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
 
 
-k=1000000
+
 pred6 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
@@ -103,19 +103,19 @@ BT2 = 14.5*por_g/25
 
 #Outlet concentrations as function of time
 #Gas
-plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='b',label='k=0')
-plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :], color='r',label='k=0.1')
-plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], color='y',label='k=10')
-plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :], color = 'k',label='k=100')
-plt.plot(pred5['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='c',label='k=10000')
-plt.plot(pred6['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='m',label='k=1000000')
+plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='b',label='Kga=10')
+plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :], color='r',label='Kga=1')
+plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], color='y',label='Kga=0.1')
+plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :], color = 'k',label='Kga=0.01')
+plt.plot(pred5['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='c',label='Kga=0.001')
+plt.plot(pred6['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='m',label='Kga=onda')
 plt.axvline(x=BT1/60,color='violet',linestyle='-',label='Theoretical breakthrough for vg=106m/h')
 #plt.axvline(x=BT2/60,color='deeppink',linestyle='-',label='Theoretical Breakthrough for vg=53m/h)')
-plt.axhline(y=0.055,color='g',label='inlet concentration')
+plt.axhline(y=cgin,color='g',label='inlet concentration')
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
-plt.legend()
-plt.title('Gas Phase')
+plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.5))
+plt.title('Gas Phase NOTE: k=1')
 plt.show()
 
 #Liquid

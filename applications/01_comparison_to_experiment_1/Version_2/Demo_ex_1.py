@@ -8,7 +8,7 @@ import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from Annes_Playground_mod_funcs_2 import tfmod  
+from Mod_Funcs import tfmod  
 
 
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -173,6 +173,15 @@ plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.5))
 plt.title('Liquid Phase')
+plt.show()
+
+#Mass of H2S instead of concentration
+plt.plot(pred1['time'] / 3600, pred1['gas_mass'][nc - 1, :], color='b',label='Gas Phase')
+plt.plot(pred1['time'] / 3600, pred1['liq_mass'][nc - 1, :], color='r',label='Liquid Phase')
+plt.legend()
+plt.title('Comparison of mass flows as predicted by the model')
+plt.xlabel('time(h)')
+plt.ylabel('mass (g) or (g/m^2)')
 plt.show()
 
 

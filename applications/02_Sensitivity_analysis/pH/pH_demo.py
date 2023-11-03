@@ -16,7 +16,7 @@ from Mod_funcs import tfmod
 L =0.51            # Filter length/depth (m) (actual 0.51, changed to be able to tell graphs apart)
 por_g = 0.80      # (m3/m3) Estimated by volume calculations
 por_l = 0.018       # (m3/m3) Estimated at 0.018, changed to be able to tell the graphs apart
-v_g = 75/3600       # superficial gas velocity m/s (approx. middle of ex1)
+v_g = 106/3600       # superficial gas velocity m/s (approx. middle of ex1)
 v_l = 0.8/3600        #liquid superficial velocity m/s (approx middle of ex1)
 nc = 100          # Number of model cells (layers)
 cg0 = 0          # (g/m3)
@@ -49,35 +49,35 @@ times = np.linspace(0, tt, nt) * 3600
 
 # Scenarios ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-pH=7
+pH=9
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
 Kaw1=pred1['Kaw']
 
 
-pH=6.5
+pH=8
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
 
-pH=6
+pH=7.5
 pred3 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
 
-pH=5.5
+pH=7
 pred4 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
 
-pH=5
+pH=6.5
 pred5 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
 
 
-pH=4.5
+pH=6
 pred6 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
@@ -125,12 +125,12 @@ plt.show()
 
 #Outlet concentrations as function of time
 #Gas
-plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='b',label='pH=7')
-plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :], color='r',label='pH=6.5')
-plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], color='y',label='pH=6')
-plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :], color = 'k',label='pH=5.5')
-plt.plot(pred5['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='c',label='pH=5')
-plt.plot(pred6['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='m',label='pH=4.5')
+plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='b',label='pH=9')
+plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :], color='r',label='pH=8')
+plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], color='y',label='pH=7.5')
+plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :], color = 'k',label='pH=7')
+plt.plot(pred5['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='c',label='pH=6.5')
+plt.plot(pred6['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='m',label='pH=6')
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
@@ -138,12 +138,12 @@ plt.title('Gas Phase')
 plt.show()
 
 #Liquid
-plt.plot(pred1['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='b',label='pH=7')
-plt.plot(pred2['time'] / 3600, pred2['liq_conc'][nc - 1, :], color='r',label='pH=6.5')
-plt.plot(pred3['time'] / 3600, pred3['liq_conc'][nc - 1, :], color='y',label='pH=6')
-plt.plot(pred4['time'] / 3600, pred4['liq_conc'][nc - 1, :], color = 'k',label='pH=5.5')
-plt.plot(pred5['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='c',label='pH=5')
-plt.plot(pred6['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='m',label='pH=4.5')
+plt.plot(pred1['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='b',label='pH=9')
+plt.plot(pred2['time'] / 3600, pred2['liq_conc'][nc - 1, :], color='r',label='pH=8')
+plt.plot(pred3['time'] / 3600, pred3['liq_conc'][nc - 1, :], color='y',label='pH=7.5')
+plt.plot(pred4['time'] / 3600, pred4['liq_conc'][nc - 1, :], color = 'k',label='pH=7')
+plt.plot(pred5['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='c',label='pH=6.5')
+plt.plot(pred6['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='m',label='pH=6')
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()

@@ -58,7 +58,7 @@ def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
 
 # Rates function
 # Arg order: time, state variable, then arguments
-def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, counter = False, recirc = False):
+def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, counter = True, recirc = True):
 
   # If time-variable concentrations coming in are given, get interpolated values
   if type(clin) is pd.core.frame.DataFrame:
@@ -224,7 +224,7 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
    out = solve_ivp(rates, [0, max(times)], y0 = y0, 
                    t_eval = times, 
                    args = (v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, counter, recirc),
-                   method = 'LSODA')
+                   method = 'Radau')
    
    # Extract mass of compound [position, time]
    mcgt = out.y[0:nc]

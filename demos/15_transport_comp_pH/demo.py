@@ -75,13 +75,13 @@ pred4 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc,
 # Closed-form solution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # For comparison with pH-specific Kga's: (OBS this can be done more elegantly...)
 z = np.linspace(0, L, 25)
-Kga = pred1['Kga']
+Kga = pred1['pars']['Kga']
 cg_7 = cgin * np.exp(-Kga / v_g * z)
-Kga = pred2['Kga']
+Kga = pred2['pars']['Kga']
 cg_10 = cgin * np.exp(-Kga / v_g * z)
-Kga = pred3['Kga']
+Kga = pred3['pars']['Kga']
 cg_11 = cgin * np.exp(-Kga / v_g * z)
-Kga = pred4['Kga']
+Kga = pred4['pars']['Kga']
 cg_12 = cgin * np.exp(-Kga / v_g * z)
 
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

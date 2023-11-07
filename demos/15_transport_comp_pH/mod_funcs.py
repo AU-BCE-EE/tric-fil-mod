@@ -5,14 +5,12 @@ import numpy as np
 import math
 import pandas as pd
 import sys
-from scipy.integrate import solve_ivp
+from scipy.integrate import solve_ivp 
 
 # Mass transfer coefficient function
 # See tfmod function for units on inputs
 def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
 
-    # Add conversion to numeric
-   
     # Hard-wired constants
     g = 9.81        # m / sec^2
     Dg = 1.16E-5    # gas diffusion coefficient in m2 / sec; compound specific
@@ -161,6 +159,9 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
    # ssa = particle specific surface area (m2 surface / m3 bulk volume)
    # count = Boolean for countercurrent flow
 
+   # Save input arguments for echoing in output
+   args_in = locals()
+
    # Constants
    # Ideal gas constant (L bar / K-mol)
    R = 0.083144 
@@ -239,5 +240,9 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
 
    mct = np.concatenate([mcgt, mclt])
    
-   # Return results as a tuple
-   return {'gas_conc': ccgt, 'liq_conc': cclt, 'gas_mass': mcgt, 'liq_mass': mclt, 'cell_pos': x, 'time': times, 'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga, 'Kaw': Kaw}
+   # Return results as a dictionary
+   return {'gas_conc': ccgt, 'liq_conc': cclt, 'gas_mass': mcgt, 'liq_mass': mclt, 
+           'cell_pos': x, 'time': times, 
+           'inputs': args_in, 
+           'pars': {'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga, 'Kaw': Kaw, 'alpha0': alpha0, 'Daw': Daw}}
+

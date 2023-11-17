@@ -33,8 +33,6 @@ pH = 6.
 # realistic pKa
 pKa = 7.
 
-# From output of pred1
-Kaw = 0.3732 # From pred1 output (check: should be the same as Kaw1)
 
 # Put inlet concentrations at equilibrium
 cgin = 0.05575209  #corresponding to 40ppm
@@ -53,34 +51,40 @@ pH=9
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
-Kaw1=pred1['Kaw']
+pred1label='pH=9'
+
+Kaw=pred1['Kaw'] #Used in closed form solution later in code
 
 
 pH=8
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
+pred2label='pH=8'
 
 pH=7.5
 pred3 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
+pred3label='pH=7.5'
 
 pH=7
 pred4 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
+pred4label='pH=7'
 
 pH=6.5
 pred5 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
-
+pred5label='pH=6.5'
 
 pH=6
 pred6 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
+pred6label='pH=6'
 
 
 # Closed-form solution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -96,12 +100,12 @@ cl = cg / Kaw
 # Gas
 plt.clf()
 plt.plot(z, cg, 'bo')
-plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, nt - 1], color='b',label='pH=7')
-plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, nt - 1], color='r',label='pH=6.5')
-plt.plot(pred3['cell_pos'], pred3['gas_conc'][:, nt - 1], color='y',label='pH=6')
-plt.plot(pred4['cell_pos'], pred4['gas_conc'][:, nt - 1], color = 'k',label='pH=5.5')
-plt.plot(pred5['cell_pos'], pred1['gas_conc'][:, nt - 1], color='c',label='pH=5')
-plt.plot(pred6['cell_pos'], pred1['gas_conc'][:, nt - 1], color='m',label='pH=4.5')
+plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, nt - 1], color='b',label=pred1label)
+plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, nt - 1], color='r',label=pred2label)
+plt.plot(pred3['cell_pos'], pred3['gas_conc'][:, nt - 1], color='y',label=pred3label)
+plt.plot(pred4['cell_pos'], pred4['gas_conc'][:, nt - 1], color = 'k',label=pred4label)
+plt.plot(pred5['cell_pos'], pred5['gas_conc'][:, nt - 1], color='c',label=pred5label)
+plt.plot(pred6['cell_pos'], pred6['gas_conc'][:, nt - 1], color='m',label=pred6label)
 plt.xlabel('Location (m)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.title('Gas Phase')
@@ -111,12 +115,12 @@ plt.show()
 # Liquid
 plt.clf()
 plt.plot(z, cl, 'bo')
-plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, nt - 1], color='b',label='7')
-plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, nt - 1], color='r',label='6.5')
-plt.plot(pred3['cell_pos'], pred3['liq_conc'][:, nt - 1], color='y',label='6')
-plt.plot(pred4['cell_pos'], pred4['liq_conc'][:, nt - 1], color = 'k',label='5.5')
-plt.plot(pred5['cell_pos'], pred1['liq_conc'][:, nt - 1], color='c',label='5')
-plt.plot(pred6['cell_pos'], pred1['liq_conc'][:, nt - 1], color='m',label='4.5')
+plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, nt - 1], color='b',label=pred1label)
+plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, nt - 1], color='r',label=pred2label)
+plt.plot(pred3['cell_pos'], pred3['liq_conc'][:, nt - 1], color='y',label=pred3label)
+plt.plot(pred4['cell_pos'], pred4['liq_conc'][:, nt - 1], color = 'k',label=pred4label)
+plt.plot(pred5['cell_pos'], pred5['liq_conc'][:, nt - 1], color='c',label=pred5label)
+plt.plot(pred6['cell_pos'], pred6['liq_conc'][:, nt - 1], color='m',label=pred6label)
 plt.xlabel('Location (m)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.title('Liquid Phase')
@@ -125,12 +129,12 @@ plt.show()
 
 #Outlet concentrations as function of time
 #Gas
-plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='b',label='pH=9')
-plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :], color='r',label='pH=8')
-plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], color='y',label='pH=7.5')
-plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :], color = 'k',label='pH=7')
-plt.plot(pred5['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='c',label='pH=6.5')
-plt.plot(pred6['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='m',label='pH=6')
+plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='b',label=pred1label)
+plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :], color='r',label=pred2label)
+plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], color='y',label=pred3label)
+plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :], color = 'k',label=pred4label)
+plt.plot(pred5['time'] / 3600, pred5['gas_conc'][nc - 1, :], color='c',label=pred5label)
+plt.plot(pred6['time'] / 3600, pred6['gas_conc'][nc - 1, :], color='m',label=pred6label)
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
@@ -138,12 +142,12 @@ plt.title('Gas Phase')
 plt.show()
 
 #Liquid
-plt.plot(pred1['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='b',label='pH=9')
-plt.plot(pred2['time'] / 3600, pred2['liq_conc'][nc - 1, :], color='r',label='pH=8')
-plt.plot(pred3['time'] / 3600, pred3['liq_conc'][nc - 1, :], color='y',label='pH=7.5')
-plt.plot(pred4['time'] / 3600, pred4['liq_conc'][nc - 1, :], color = 'k',label='pH=7')
-plt.plot(pred5['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='c',label='pH=6.5')
-plt.plot(pred6['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='m',label='pH=6')
+plt.plot(pred1['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='b',label=pred1label)
+plt.plot(pred2['time'] / 3600, pred2['liq_conc'][nc - 1, :], color='r',label=pred2label)
+plt.plot(pred3['time'] / 3600, pred3['liq_conc'][nc - 1, :], color='y',label=pred3label)
+plt.plot(pred4['time'] / 3600, pred4['liq_conc'][nc - 1, :], color = 'k',label=pred4label)
+plt.plot(pred5['time'] / 3600, pred5['liq_conc'][nc - 1, :], color='c',label=pred5label)
+plt.plot(pred6['time'] / 3600, pred6['liq_conc'][nc - 1, :], color='m',label=pred6label)
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()

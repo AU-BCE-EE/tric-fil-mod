@@ -144,8 +144,8 @@ plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='b',label='1.
 plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :], color='r',label='1.2 v_g=106m/h, v_l=0.4m/h')
 plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], color='y',label='1. 3v_g=106m/h, v_l=1.2m/h')
 plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :], color = 'k',label='1.4 v_g=53m/h, v_l=1.2m/h')
-plt.plot(pred5['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='c',label='1.5 v_g=53m/h, v_l=0.8m/h')
-plt.plot(pred6['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='m',label='1.6v_g=106m/h, v_l=0.8m/h')
+plt.plot(pred5['time'] / 3600, pred5['gas_conc'][nc - 1, :], color='c',label='1.5 v_g=53m/h, v_l=0.8m/h')
+plt.plot(pred6['time'] / 3600, pred6['gas_conc'][nc - 1, :], color='m',label='1.6v_g=106m/h, v_l=0.8m/h')
 plt.axvline(x=BT1/60,color='violet',linestyle='-',label='Theoretical breakthrough for vg=106m/h')
 plt.axvline(x=BT2/60,color='deeppink',linestyle='-',label='Theoretical Breakthrough for vg=53m/h)')
 plt.axhline(y=0.055,color='g',label='inlet concentration')
@@ -160,15 +160,15 @@ plt.plot(pred1['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='b',label='v_
 plt.plot(pred2['time'] / 3600, pred2['liq_conc'][nc - 1, :], color='r',label='v_g=106m/h, v_l=0.4m/h')
 plt.plot(pred3['time'] / 3600, pred3['liq_conc'][nc - 1, :], color='y',label='v_g=106m/h, v_l=1.2m/h')
 plt.plot(pred4['time'] / 3600, pred4['liq_conc'][nc - 1, :], color = 'k',label='v_g=53m/h, v_l=1.2m/h')
-plt.plot(pred5['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='c',label='v_g=53m/h, v_l=0.8m/h')
-plt.plot(pred6['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='m',label='v_g=106m/h, v_l=0.8m/h')
+plt.plot(pred5['time'] / 3600, pred5['liq_conc'][nc - 1, :], color='c',label='v_g=53m/h, v_l=0.8m/h')
+plt.plot(pred6['time'] / 3600, pred6['liq_conc'][nc - 1, :], color='m',label='v_g=106m/h, v_l=0.8m/h')
 #equilibrium concentrations
 plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :]/Kaw, color='b',linestyle='dashed')
 plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :]/Kaw, color='r',linestyle='dashed')
 plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :]/Kaw, color='y',linestyle='dashed')
 plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :]/Kaw, color = 'k',linestyle='dashed')
-plt.plot(pred5['time'] / 3600, pred1['gas_conc'][nc - 1, :]/Kaw, color='c',linestyle='dashed')
-plt.plot(pred6['time'] / 3600, pred1['gas_conc'][nc - 1, :]/Kaw, color='m',linestyle='dashed',label='All dashed are equilibrium values')
+plt.plot(pred5['time'] / 3600, pred5['gas_conc'][nc - 1, :]/Kaw, color='c',linestyle='dashed')
+plt.plot(pred6['time'] / 3600, pred6['gas_conc'][nc - 1, :]/Kaw, color='m',linestyle='dashed',label='All dashed are equilibrium values')
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.5))
@@ -186,8 +186,8 @@ plt.show()
 
 
 #comparison to data experiment 1
-from Data_treatment_v1 import t1
-from Data_treatment_v1 import C_out1
+from Data_treatment_ex1 import t1
+from Data_treatment_ex1 import C_out1
 plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='b',label='model')
 plt.plot(t1,C_out1,label='experimental data')
 plt.xlabel('Time (h)')
@@ -197,8 +197,8 @@ plt.title('Experiment 1.1')
 plt.show()
 
 #comparison to data experiment 2
-from Data_treatment_v1 import t2
-from Data_treatment_v1 import C_out2
+from Data_treatment_ex1 import t2
+from Data_treatment_ex1 import C_out2
 plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :], color='b',label='model')
 plt.plot(t2,C_out2,label='experimental data')
 plt.xlabel('Time (h)')
@@ -208,8 +208,8 @@ plt.title('Experiment 1.2')
 plt.show()
 
 #comparison to data experiment 3
-from Data_treatment_v1 import t3
-from Data_treatment_v1 import C_out3
+from Data_treatment_ex1 import t3
+from Data_treatment_ex1 import C_out3
 plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], color='b',label='model')
 plt.plot(t3,C_out3,label='experimental data')
 plt.xlabel('Time (h)')
@@ -220,8 +220,8 @@ plt.show()
 
 
 #comparison to data experiment 4
-from Data_treatment_v1 import t4
-from Data_treatment_v1 import C_out4
+from Data_treatment_ex1 import t4
+from Data_treatment_ex1 import C_out4
 plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :], color='b',label='model')
 plt.plot(t4,C_out4,label='experimental data')
 plt.xlabel('Time (h)')
@@ -231,8 +231,8 @@ plt.title('Experiment 1.4')
 plt.show()
 
 #comparison to data experiment 5
-from Data_treatment_v1 import t5
-from Data_treatment_v1 import C_out5
+from Data_treatment_ex1 import t5
+from Data_treatment_ex1 import C_out5
 plt.plot(pred5['time'] / 3600, pred5['gas_conc'][nc - 1, :], color='b',label='model')
 plt.plot(t5,C_out5,label='experimental data')
 plt.xlabel('Time (h)')
@@ -243,8 +243,8 @@ plt.show()
 
 
 #comparison to data experiment 6
-from Data_treatment_v1 import t6
-from Data_treatment_v1 import C_out6
+from Data_treatment_ex1 import t6
+from Data_treatment_ex1 import C_out6
 plt.plot(pred6['time'] / 3600, pred6['gas_conc'][nc - 1, :], color='b',label='model')
 plt.plot(t6,C_out6,label='experimental data')
 plt.xlabel('Time (h)')
@@ -255,8 +255,7 @@ plt.show()
 
 
 #All experimental data in one graph
-from Data_treatment_v1 import t1,t2,t3,t4,t5,t6
-from Data_treatment_v1 import C_out1,C_out2,C_out3,C_out4,C_out5,C_out6
+
 
 plt.plot(t1,C_out1,color='b', label='1.1 v_g=53m/h, v_l=0.4m/h')
 plt.plot(t2,C_out2,color='r',label='1.2 v_g=106m/h, v_l=0.4m/h')

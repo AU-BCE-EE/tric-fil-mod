@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov  1 09:21:41 2023
+Created on Fri Nov 17 10:02:44 2023
 
-@author: Mortensen
+@author: bruger
 """
 
-##data treatment of experiment 1.1.1
+##data treatment of experiment 1.3 repetitions
 
 #Import packages
 import numpy as np
@@ -50,6 +50,7 @@ C_out1=H2S1[-cycle_stop1:-cycle_start1]
 
 time_norm1=time1-time1[-cycle_start1]
 t1=time_norm1[-cycle_stop1:-cycle_start1]
+
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #data set number 2
@@ -185,35 +186,3 @@ C_out5=H2S5[-cycle_stop5:-cycle_start5]
 time_norm5=time5-time5[-cycle_start5]
 t5=time_norm5[-cycle_stop5:-cycle_start5]
 
-
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#data set number 6
-
-name6='ex_1.6.1.csv' #file name
-
-#start and stop times
-cycle_start6=100
-cycle_stop6=460
-
-
-#Initial arrays
-time6=H2S6=[0.0]
-
-
-#reading the file and saving time, mz35 and humid
-#Remember to change the file name
-with open(name6) as file6: 
-    data6=csv.reader(file6,delimiter=';')
-    header6=next(data6)
-    for row in data6:
-        time_s6= float(row[header6.index('ï»¿Relative Time')])
-        time6 = np.insert(time6,0,time_s6/3600)
-        mz356 = float(row[header6.index('m/z 35.00 ch3')])
-        humid6 =float(row[header6.index('37/21')])
-        H2S6 = np.insert(H2S6,0,float(mz356*(a*math.log(humid6)+b))*10**-6*1.01325/(0.00008314*298)*34.08088) # calibration curve
-#Be aware the the data is "reversed" so that time 0 is at index 860 (or similar for other data sets)
-
-C_out6=H2S6[-cycle_stop6:-cycle_start6]
-
-time_norm6=time6-time6[-cycle_start6]
-t6=time_norm6[-cycle_stop6:-cycle_start6]

@@ -35,9 +35,6 @@ pH = 6.
 # realistic pKa
 pKa = 7.
 
-# From output of pred1
-Kaw = 0.3732 # From pred1 output (check: should be the same as Kaw1)
-
 # Put inlet concentrations at equilibrium
 cgin = 0.05575209  #corresponding to 40ppm
 clin = 0
@@ -55,8 +52,7 @@ times = np.linspace(0, tt, nt) * 3600
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 10, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
-Kaw1=pred1['Kaw']
-
+Kaw=pred1['Kaw'] #used for close loop solution later in code
 
 
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 

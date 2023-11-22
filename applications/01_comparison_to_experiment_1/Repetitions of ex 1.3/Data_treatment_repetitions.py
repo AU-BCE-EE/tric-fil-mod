@@ -12,21 +12,60 @@ import numpy as np
 import csv
 import math
 import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+#Calibration ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#start time
+startcyclecali=105
+endcyclecali=750
+
+#initial guesses
+params=[0.008,-0.006]
 
 
+namecali='calibration_16.11.csv' #name of file
 
 
-#Calibration parameters
-a=0.0082992
-b=-0.0062214    
+#Initial arrays
+humid=correction=[0.0]
 
+#actual concentration in ppm
+C_actual=40
+
+
+#reading the file and saving correction factor and humid
+#Remember to change the file name
+with open(namecali) as filecali: 
+    datacali=csv.reader(filecali,delimiter=';')
+    headercali=next(datacali)
+    for row in datacali:
+        mz35=float(row[headercali.index('ï»¿m/z 35.00 ch3')])
+        correction= np.insert(correction,0,C_actual/mz35) #define correction factor as the ratio between actual and measured concentrations
+        humid =np.insert(humid,0,float(row[headercali.index('37/21')])) #Define humidity as mz37 / mz 21. Make this calculation in excel from "raw siganl intensities"
+#Note that the order is reversed so that the first obtained data is last in the array
+x=humid[-endcyclecali:-startcyclecali]   
+y=correction[-endcyclecali:-startcyclecali]     
+        
+def logcurve(h,a,b):#a and b is calibration parameters, h is humidity and c is correction factor
+    n=h.size
+    c=np.zeros(n)
+    for i in range(n):
+        c[i]=a*np.log(h[i])+b
+    return c
+
+#Making the regression
+copt,ccov=curve_fit(logcurve,x,y,p0=params)
+a=float(copt[0])
+b=float(copt[1])
+ 
 #data set number 1 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-name1='ex_1.1.1.csv' #name of file
+name1='ex_1.3.1_new_setup.csv' #name of file
 
 #start and stop times
-cycle_start1=65
-cycle_stop1=520
+cycle_start1=174
+cycle_stop1=460
 
 
 #Initial arrays
@@ -55,11 +94,11 @@ t1=time_norm1[-cycle_stop1:-cycle_start1]
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #data set number 2
 
-name2='ex_1.2.1.csv' #file name
+name2='ex_1.3.2_new_setup.csv' #file name
 
 #start and stop times
-cycle_start2=70
-cycle_stop2=367
+cycle_start2=80
+cycle_stop2=206
 
 
 #Initial arrays
@@ -88,6 +127,9 @@ t2=time_norm2[-cycle_stop2:-cycle_start2]
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #data set number 3
+
+a=0.008303662782954838
+b=-0.006235424290155132 #Old calibration for old data
 
 name3='ex_1.3.1.csv' #file name
 
@@ -122,11 +164,11 @@ t3=time_norm3[-cycle_stop3:-cycle_start3]
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #data set number 4
 
-name4='ex_1.4.1.csv' #file name
+name4='ex_1.3.2.csv' #file name
 
 #start and stop times
-cycle_start4=80
-cycle_stop4=450
+cycle_start4=85
+cycle_stop4=420
 
 
 #Initial arrays
@@ -157,11 +199,11 @@ t4=time_norm4[-cycle_stop4:-cycle_start4]
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #data set number 5
 
-name5='ex_1.5.1.csv' #file name
+name5='ex_1.3.3.csv' #file name
 
 #start and stop times
-cycle_start5=90
-cycle_stop5=510
+cycle_start5=70
+cycle_stop5=370
 
 
 #Initial arrays

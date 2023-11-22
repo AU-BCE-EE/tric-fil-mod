@@ -15,15 +15,15 @@ from scipy.optimize import curve_fit
 
 
 #start time
-startcyclecali=20
-endcyclecali=700
+startcyclecali=105
+endcyclecali=750
 
 #initial guesses
 params=[0.008,-0.006]
 
 #data set number 1 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-namecali='calibration_1.csv' #name of file
+namecali='calibration_16.11.csv' #name of file
 
 
 #Initial arrays

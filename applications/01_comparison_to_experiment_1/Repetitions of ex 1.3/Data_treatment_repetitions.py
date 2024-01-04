@@ -124,12 +124,47 @@ time_norm2=time2-time2[-cycle_start2]
 t2=time_norm2[-cycle_stop2:-cycle_start2]
 
 
+#data set for inlet (done befor a and b is changed to the old calibration data)~~~~~~~~~~~~~~~~~~~~~~~~
+# index number 6 is due to this being at the bottom of the document initially, and does not have any influence of the data
+
+name6='ex_1.3.1_new_setup.csv' #file name
+
+#start and stop times
+cycle_start6=465
+cycle_stop6=800
+
+
+#Initial arrays
+time6=H2S6=[0.0]
+
+
+#reading the file and saving time, mz35 and humid
+#Remember to change the file name
+with open(name6) as file6: 
+    data6=csv.reader(file6,delimiter=';')
+    header6=next(data6)
+    for row in data6:
+        time_s6= float(row[header6.index('ï»¿Relative Time')])
+        time6 = np.insert(time6,0,time_s6/3600)
+        mz356 = float(row[header6.index('m/z 35.00 ch3')])
+        humid6 =float(row[header6.index('37/21')])
+        H2S6 = np.insert(H2S6,0,float(mz356*(a*math.log(humid6)+b))*10**-6*1.01325/(0.00008314*298)*34.08088) # calibration curve
+#Be aware the the data is "reversed" so that time 0 is at index 860 (or similar for other data sets)
+
+C_out6=H2S6[-cycle_stop6:-cycle_start6]
+
+time_norm6=time6-time6[-cycle_start6]
+t6=time_norm6[-cycle_stop6:-cycle_start6]
+
+
+C_inlet=np.average(C_out6)
+
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #data set number 3
 
 a=0.008303662782954838
-b=-0.006235424290155132 #Old calibration for old data
+b=-0.006235424290155132 #Old calibration for old data (form 01_comparison_to_experiment_1 and calibration visualization / calibration done 4.10.23)
 
 name3='ex_1.3.1.csv' #file name
 

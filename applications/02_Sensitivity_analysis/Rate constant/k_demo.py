@@ -14,8 +14,8 @@ from Mod_funcs import tfmod
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # See notes in tfmod.py for more complete descriptions
 L = 0.51            # Filter length/depth (m) 
-por_g = 0.80      # (m3/m3) estimated i ex1
-por_l = 0.02       # (m3/m3) Close to volume-based estimate
+por_g = 0.73      # (m3/m3) estimated i ex1
+por_l = 0.08       # (m3/m3) Close to volume-based estimate
 v_g = 106/3600       # superficial gas velocity m/s (chosen to represent ex1)
 v_l = 0.8/3600        #liquid superficial velocity m/s (chosen to represent ex1)
 nc = 100          # Number of model cells (layers)
@@ -94,12 +94,12 @@ pred6label='k=10, pH=7, Kga=0.1'
 
 
 # Closed-form solution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-z = np.linspace(0, L, 10)
-pr = por_l / por_g
-ctin = por_g * cgin + por_l * clin
-ct = ctin * np.exp(-k  * por_l / (v_g * Kaw) * z)
-cg = Kaw * ct / (por_g * Kaw + por_l)
-cl = cg / Kaw
+# z = np.linspace(0, L, 10)
+# pr = por_l / por_g
+# ctin = por_g * cgin + por_l * clin
+# ct = ctin * np.exp(-k  * por_l / (v_g * Kaw) * z)
+# cg = Kaw * ct / (por_g * Kaw + por_l)
+# cl = cg / Kaw
 
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

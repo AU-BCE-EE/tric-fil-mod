@@ -8,15 +8,15 @@ import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from Annes_Playground_mod_funcs import tfmod  
+from Mod_funcs import tfmod  
 
 
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # See notes in tfmod.py for more complete descriptions
 L = 0.51            # Filter length/depth (m) 
-por_g = 0.80      # (m3/m3) Estimated by volume calculations
+por_g = 0.73      # (m3/m3) Estimated by volume calculations
 por_l = 0.2       # (m3/m3) changed later
-v_g = 75/3600       # superficial gas velocity m/s (chosen to represent ex1)
+v_g = 106/3600       # superficial gas velocity m/s (chosen to represent ex1)
 v_l = 0.8/3600        #liquid superficial velocity m/s (chosen to represent ex1)
 nc = 100          # Number of model cells (layers)
 cg0 = 0          # (g/m3)
@@ -25,16 +25,14 @@ henry = (0.1, 2000.)
 temp = 21.       # (degrees C)
 dens_l = 1000    # Liquid density (kg/m3)
 
-k = 0        # Reaction rate (1/s). Small because of inert carrier
+k = 1        # Reaction rate (1/s). Small because of inert carrier
                  # Reaction could be acid/base that changes the pH
 
-pH = 6.
+pH = 8.
 
 # realistic pKa
 pKa = 7.
 
-# From output of pred1
-Kaw = 0.3732 # From pred1 output (check: should be the same as Kaw1)
 
 # Put inlet concentrations at equilibrium
 cgin = 0.05575209  #corresponding to 40ppm
@@ -51,72 +49,85 @@ times = np.linspace(0, tt, nt) * 3600
 
 por_l=0.01
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 0.02, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
-Kaw1=pred1['Kaw']
+pred1label='Por_l=0.01, Kga=0.02'
 
 
-por_l=0.02
+
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
+pred2label='Por_l=0.01, Kga=onda'
 
-por_l=0.03
+por_l=0.08
 pred3 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 0.02, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
+pred3label='Por_l=0.08, Kga=0.02'
 
-por_l=0.05
+
 pred4 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
+pred4label='Por_l=0.08, Kga=onda'
 
-por_l=0.1
+por_l=0.3
 pred5 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 0.02, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
+pred5label='Por_l=0.3, Kga=0.02'
 
 
-por_l=0.15
 pred6 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
+pred6label='Por_l=0.3, Kga=onda'
 
 
 # Closed-form solution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-z = np.linspace(0, L, 10)
-pr = por_l / por_g
-ctin = por_g * cgin + por_l * clin
-ct = ctin * np.exp(-k  * por_l / (v_g * Kaw) * z)
-cg = Kaw * ct / (por_g * Kaw + por_l)
-cl = cg / Kaw
+# z = np.linspace(0, L, 10)
+# pr = por_l / por_g
+# ctin = por_g * cgin + por_l * clin
+# ct = ctin * np.exp(-k  * por_l / (v_g * Kaw) * z)
+# cg = Kaw * ct / (por_g * Kaw + por_l)
+# cl = cg / Kaw
 
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Breakthrough time calculated from volume (V=14.5L), Por_g=0.8 and volumetric velocities 25l/min (v_g=53m/h) 
+# and 50 L/min (v_g=106m/h)
+
+BT1 = 14.5*por_g/50
+BT2 = 14.5*por_g/25
 
 
 #Outlet concentrations as function of time
 #Gas
-plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='b',label='por_l=0.01')
-plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :], color='r',label='por_l=0.02')
-plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], color='y',label='por_l=0.03')
-plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :], color = 'k',label='por_l=0.05')
-plt.plot(pred5['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='c',label='por_l=0.1')
-plt.plot(pred6['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='m',label='por_l=0.15')
+plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='b',label=pred1label)
+plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :], color='r',label=pred2label)
+plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :], color='y',label=pred3label)
+plt.plot(pred4['time'] / 3600, pred4['gas_conc'][nc - 1, :], color = 'k',label=pred4label)
+plt.plot(pred5['time'] / 3600, pred5['gas_conc'][nc - 1, :], color='c',label=pred5label)
+plt.plot(pred6['time'] / 3600, pred6['gas_conc'][nc - 1, :], color='m',label=pred6label)
+plt.axvline(x=BT1/60,color='violet',linestyle='-',label='Theoretical breakthrough for vg=106m/h')
+#plt.axvline(x=BT2/60,color='deeppink',linestyle='-',label='Theoretical Breakthrough for vg=53m/h)')
+plt.axhline(y=cgin,color='g',label='inlet concentration')
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
-plt.legend()
-plt.title('Gas Phase')
+plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.5))
+plt.title('Gas Phase NOTE: k=1 and pH=8')
 plt.show()
 
 #Liquid
-plt.plot(pred1['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='b',label='por_l=0.01')
-plt.plot(pred2['time'] / 3600, pred2['liq_conc'][nc - 1, :], color='r',label='por_l=0.02')
-plt.plot(pred3['time'] / 3600, pred3['liq_conc'][nc - 1, :], color='y',label='por_l=0.03')
-plt.plot(pred4['time'] / 3600, pred4['liq_conc'][nc - 1, :], color = 'k',label='por_l=0.05')
-plt.plot(pred5['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='c',label='por_l=0.1')
-plt.plot(pred6['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='m',label='por_l=0.15')
+plt.plot(pred1['time'] / 3600, pred1['liq_conc'][nc - 1, :], color='b',label=pred1label)
+plt.plot(pred2['time'] / 3600, pred2['liq_conc'][nc - 1, :], color='r',label=pred2label)
+plt.plot(pred3['time'] / 3600, pred3['liq_conc'][nc - 1, :], color='y',label=pred3label)
+plt.plot(pred4['time'] / 3600, pred4['liq_conc'][nc - 1, :], color = 'k',label=pred4label)
+plt.plot(pred5['time'] / 3600, pred5['liq_conc'][nc - 1, :], color='c',label=pred5label)
+plt.plot(pred6['time'] / 3600, pred6['liq_conc'][nc - 1, :], color='m',label=pred6label)
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
-plt.title('Liquid Phase')
+plt.title('Liquid Phase NOTE: k=1 and pH=8')
 plt.show()

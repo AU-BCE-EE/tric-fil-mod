@@ -85,7 +85,7 @@ with open(name1) as file1:
         time1 = np.insert(time1,0,time_s1/3600)
         mz351 = float(row[header1.index('m/z 35.00 ch3')])
         humid1 =float(row[header1.index('37/21')])
-        H2S1 = np.insert(H2S1,0,float(mz351*(a*math.log(humid1)+b))*10**-6*1.01325/(0.00008314*298)*34.08088) # calibration curve
+        H2S1 = np.insert(H2S1,0,float(mz351*(a*math.log(humid1)+b))*10**-6*1.01325/(0.00008314*298)*34.08088) # calibration curve and calculation from ppm to g/m3
 #Be aware the the data is "reversed" so that time 0 is at index 860 (or similar for other data sets)
 
 C_out1=H2S1[-cycle_stop1:-cycle_start1]

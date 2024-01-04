@@ -61,7 +61,7 @@ plt.plot(x,y,'o')
 plt.plot(x,yfit,label=('y= %1.5f'%copt[0]+'*ln(x) %1.5f'%copt[1]))
 plt.xlabel('m/z 37 / m/z 21')
 plt.ylabel('correction factor []')
-plt.title('Calibration Curve')
+plt.title('Calibration Curve 4.10')
 plt.legend(loc='lower right')
 plt.show
 A=float(copt[0])

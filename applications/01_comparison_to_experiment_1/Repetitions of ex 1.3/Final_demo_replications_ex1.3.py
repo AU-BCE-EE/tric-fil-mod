@@ -35,7 +35,9 @@ pKa = 7.
 
 
 # Put inlet concentrations at equilibrium
-cgin = 0.05575209  #corresponding to 40ppm
+from Data_treatment_repetitions import C_inlet
+cgin = float(C_inlet)  #Average measured value. Note: For future this will be a function of time. But as it is not on the same time axis as the outlet concentrations,
+# an average value is just as good as anything time dependent.  
 clin = 0
 
 # Times for model output in h
@@ -49,20 +51,20 @@ times = np.linspace(0, tt, nt) * 3600
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = 106/3600, v_l = 1.2/3600, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
-Kaw=pred1['Kaw'] #used in "closed form solution" later in script
-pred1label='Model' 
+
+pred1label='Model with average measured inlet concentration' 
 
 
 
 
 
 # Closed-form solution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-z = np.linspace(0, L, 10)
-pr = por_l / por_g
-ctin = por_g * cgin + por_l * clin
-ct = ctin * np.exp(-k  * por_l / (v_g * Kaw) * z)
-cg = Kaw * ct / (por_g * Kaw + por_l)
-cl = cg / Kaw
+# z = np.linspace(0, L, 10)
+# pr = por_l / por_g
+# ctin = por_g * cgin + por_l * clin
+# ct = ctin * np.exp(-k  * por_l / (v_g * Kaw) * z)
+# cg = Kaw * ct / (por_g * Kaw + por_l)
+# cl = cg / Kaw
 
 
 
@@ -89,7 +91,7 @@ plt.plot(t5,C_out5,color='c',label='Old setup 3')
 plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :], color='m',label=pred1label)
 plt.axvline(x=BT1/60,color='violet',linestyle='-',label='Theoretical breakthrough for vg=106m/h')
 #plt.axvline(x=BT2/60,color='deeppink',linestyle='-',label='Theoretical Breakthrough for vg=53m/h)')
-plt.axhline(y=0.055,color='g',label='inlet concentration')
+plt.axhline(y=cgin,color='g',label='Measured inlet concentration')
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.5))
 plt.title('Experiment 3 all experimental data')
 plt.xlabel('Time(h)')

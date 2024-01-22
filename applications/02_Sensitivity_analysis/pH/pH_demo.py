@@ -8,12 +8,13 @@ import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from Mod_funcs import tfmod  
+from Mod_funcs import tfmod
+  
 
 
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # See notes in tfmod.py for more complete descriptions
-L =0.51            # Filter length/depth (m) (actual 0.51, changed to be able to tell graphs apart)
+L =0.51            # Filter length/depth (m) 
 por_g = 0.73     # (m3/m3) Estimated by volume calculations
 por_l = 0.08       # (m3/m3) Estimated at 0.08, changed to be able to tell the graphs apart
 v_g = 106/3600       # superficial gas velocity m/s (approx. middle of ex1)
@@ -42,7 +43,7 @@ clin = 0
 tt = 0.08 
 # Number of time rows
 nt = 200
-times = np.linspace(0, tt, nt) * 3600
+times = np.linspace(0, tt, nt) * 3600 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Scenarios ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

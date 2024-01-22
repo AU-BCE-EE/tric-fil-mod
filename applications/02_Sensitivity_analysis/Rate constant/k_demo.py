@@ -73,24 +73,26 @@ pred3 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc,
 pred3label='k=1, pH=7, Kga=onda'
 
 
-k=10
+k=1000
 pred4 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
-pred4label='k=10, pH=7, Kga=onda'
+pred4label='k=1000, pH=7, Kga=onda'
+
+k=0.1
 
 pH=8
 pred5 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 0.05, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
-pred5label='k=10, pH=8,Kga=onda'
+pred5label='k=0.1, pH=8,Kga=onda'
 
 pH=7
 Kga=0.1
 pred6 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 0.1, k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
-pred6label='k=10, pH=7, Kga=0.1'
+pred6label='k=0.1, pH=7, Kga=0.1'
 
 
 # Closed-form solution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -124,21 +124,12 @@ plt.title('Liquid Phase @ pH=9')
 plt.legend()
 plt.show()
 
-#total mass
-#plt.clf()
-#plt.plot(z, cl, 'bo')
-i=0
-SUM=0
-totSUM=0
-for i in range (nc):
-    SUM=SUM+pred1['tot_mass'][i,:]
-    totSUM=SUM+pred1['SH_mass'][i,:]
-    i=i+1
 
-    
+
+#plotting the total mass of sulfur and H2S    
  
-plt.plot(pred1['time']/3600, SUM, color='b',label='mass of H2S')
-plt.plot(pred1['time']/3600, totSUM, color='r',label='mass of total sulfur compounds')
+plt.plot(pred1['time']/3600, pred1['column_mass'], color='b',label='mass of H2S')
+#plt.plot(pred1['time']/3600, pred1['with_SH'], color='r',label='mass of total sulfur compounds')
 plt.xlabel('Time (h)')
 plt.ylabel('Compound mass. (g)')
 plt.title('Total mass in column @ pH=9')

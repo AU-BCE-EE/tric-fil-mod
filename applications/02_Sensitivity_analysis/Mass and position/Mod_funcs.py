@@ -233,7 +233,9 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
    # Extract mass of compound [position, time]
    mcgt = out.y[0:nc]
    mclt = out.y[nc:(2 * nc)]
-   mctot=mcgt+mclt
+   mccol=np.sum(mcgt,0)+np.sum(mclt,0)
+   mctot = mclt+mcgt
+   
 
    # Get concentrations vs. time
    # Gas
@@ -242,15 +244,17 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
    cclt = mclt / np.transpose(np.tile(vol_liq, (mclt.shape[1], 1)))
    # Total
    cctt = mclt / np.transpose(np.tile(vol_tot, (mclt.shape[1], 1)))
+   
    #concentration and mass of SH-
    cSH=cclt*10**(pH-pKa)
-   mSH=cSH*np.transpose(np.tile(vol_liq, (mclt.shape[1], 1)))
-
+   mSH=np.sum(cSH*np.transpose(np.tile(vol_liq, (mclt.shape[1], 1))),0)
+   mtotS=np.sum(mcgt,0)+np.sum(mclt,0)+np.sum(mSH,0)
+   
    mct = np.concatenate([mcgt, mclt])
    
    # Return results as a dictionary
    return {'gas_conc': ccgt, 'liq_conc': cclt, 'gas_mass': mcgt, 'liq_mass': mclt, 
-           'cell_pos': x, 'time': times, 'Kaw':Kaw,'tot_mass': mctot, 'SH_mass':mSH,
-           'inputs': args_in,
+           'cell_pos': x, 'time': times, 'Kaw':Kaw,'tot_mass': mctot, 'with_SH':mtotS,
+           'inputs': args_in,'column_mass':mccol,
            'pars': {'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga, 'Kaw': Kaw, 'alpha0': alpha0, 'Daw': Daw, 'y0':y0}}
 

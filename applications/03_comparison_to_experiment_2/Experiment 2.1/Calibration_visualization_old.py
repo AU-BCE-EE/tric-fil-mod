@@ -16,14 +16,14 @@ from scipy.optimize import curve_fit
 
 #start time
 startcyclecali=80 #CHANGE_ME
-endcyclecali=500 #CHANGE_ME
+endcyclecali=2000 #CHANGE_ME
 
 #initial guesses
 params=[0.008,-0.006]
 
 #data set number 1 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-namecali='Calibration_23.01.24.csv' #name of file
+namecali='calibration_17.1.csv' #name of file
 
 
 #Initial arrays

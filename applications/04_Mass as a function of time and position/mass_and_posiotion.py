@@ -53,19 +53,11 @@ pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc
               pH = pH, temp = temp, dens_l = dens_l, times = times)
 
 
-# Closed-form solution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# z = np.linspace(0, L, 10)
-# pr = por_l / por_g
-# ctin = por_g * cgin + por_l * clin
-# ct = ctin * np.exp(-k  * por_l / (v_g * Kaw) * z)
-# cg = Kaw * ct / (por_g * Kaw + por_l)
-# cl = cg / Kaw
+
 
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Profiles
 # Gas
-#plt.clf()
-#plt.plot(z, cg, 'bo')
 plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 1], color='b',label='time=start')
 plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, nt - 160], color='r',label='time=1/5')
 plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, nt - 120], color='y',label='time=2/5')
@@ -79,8 +71,6 @@ plt.legend()
 plt.show()
 
 #Liquid
-#plt.clf()
-#plt.plot(z, cl, 'bo')
 plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 1], color='b',label='time=start')
 plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, nt - 160], color='r',label='time=1/5')
 plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, nt - 120], color='y',label='time=2/5')
@@ -95,8 +85,6 @@ plt.show()
 
 # Profiles
 # Gas
-#plt.clf()
-#plt.plot(z, cg, 'bo')
 plt.plot(pred1['cell_pos'], pred1['gas_mass'][:, 1], color='b',label='time=start')
 plt.plot(pred1['cell_pos'], pred1['gas_mass'][:, nt - 160], color='r',label='time=1/5')
 plt.plot(pred1['cell_pos'], pred1['gas_mass'][:, nt - 120], color='y',label='time=2/5')
@@ -110,8 +98,7 @@ plt.legend()
 plt.show()
 
 #Liquid
-#plt.clf()
-#plt.plot(z, cl, 'bo')
+
 plt.plot(pred1['cell_pos'], pred1['liq_mass'][:, 1], color='b',label='time=start')
 plt.plot(pred1['cell_pos'], pred1['liq_mass'][:, nt - 160], color='r',label='time=1/5')
 plt.plot(pred1['cell_pos'], pred1['liq_mass'][:, nt - 120], color='y',label='time=2/5')
@@ -125,11 +112,11 @@ plt.legend()
 plt.show()
 
 
-
-#plotting the total mass of sulfur and H2S    
+#The entire column
+#plotting the total mass of sulfur and H2S in thhe entire column as a function of time    
  
-plt.plot(pred1['time']/3600, pred1['column_mass'], color='b',label='mass of H2S')
-#plt.plot(pred1['time']/3600, pred1['with_SH'], color='r',label='mass of total sulfur compounds')
+plt.plot(pred1['time']/3600, pred1['H2S_mass'], color='b',label='mass of H2S')
+plt.plot(pred1['time']/3600, pred1['tot_mass'], color='r',label='mass of H2S and HS')
 plt.xlabel('Time (h)')
 plt.ylabel('Compound mass. (g)')
 plt.title('Total mass in column @ pH=9')

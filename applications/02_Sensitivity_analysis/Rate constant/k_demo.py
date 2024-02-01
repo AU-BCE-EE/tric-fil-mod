@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-from Mod_funcs import tfmod  
+shutil.copy('../../../mod_funcs.py', '.')
+from mod_funcs import tfmod 
 
 
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,7 +54,6 @@ k=0
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
               pH = pH, temp = temp, dens_l = dens_l, times = times)
-Kaw=pred1['Kaw'] #used in "closed form solution" later in script
 pred1label='k=0, pH=7, Kga=onda' 
 
 
@@ -95,13 +94,6 @@ pred6 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = v_g, v_l = v_l, nc = nc,
 pred6label='k=0.1, pH=7, Kga=0.1'
 
 
-# Closed-form solution ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# z = np.linspace(0, L, 10)
-# pr = por_l / por_g
-# ctin = por_g * cgin + por_l * clin
-# ct = ctin * np.exp(-k  * por_l / (v_g * Kaw) * z)
-# cg = Kaw * ct / (por_g * Kaw + por_l)
-# cl = cg / Kaw
 
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

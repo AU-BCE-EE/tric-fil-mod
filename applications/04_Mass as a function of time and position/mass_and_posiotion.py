@@ -7,16 +7,17 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+shutil.copy('../../mod_funcs.py', '.')
+from mod_funcs import tfmod
 
-from Mod_funcs import tfmod
   
 
 
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # See notes in tfmod.py for more complete descriptions
 L =0.51            # Filter length/depth (m) 
-por_g = 0.73     # (m3/m3) Estimated by volume calculations
-por_l = 0.08       # (m3/m3) Estimated at 0.08, changed to be able to tell the graphs apart
+por_g = 0.77     # (m3/m3) Estimated by volume calculations
+por_l = 0.22       # (m3/m3) Estimated at 0.08, changed to be able to tell the graphs apart
 v_g = 106/3600       # superficial gas velocity m/s (approx. middle of ex1)
 v_l = 0.8/3600        #liquid superficial velocity m/s (approx middle of ex1)
 nc = 100          # Number of model cells (layers)
@@ -40,7 +41,7 @@ cgin = 0.05575209  #corresponding to 40ppm
 clin = 0
 
 # Times for model output in h
-tt = 0.08 
+tt = 0.35 
 # Number of time rows
 nt = 200
 times = np.linspace(0, tt, nt) * 3600 
@@ -115,8 +116,7 @@ plt.show()
 #The entire column
 #plotting the total mass of sulfur and H2S in thhe entire column as a function of time    
  
-plt.plot(pred1['time']/3600, pred1['H2S_mass'], color='b',label='mass of H2S')
-plt.plot(pred1['time']/3600, pred1['tot_mass'], color='r',label='mass of H2S and HS')
+plt.plot(pred1['time']/3600, pred1['tot_mass'], color='b',label='mass of compound')
 plt.xlabel('Time (h)')
 plt.ylabel('Compound mass. (g)')
 plt.title('Total mass in column @ pH=9')

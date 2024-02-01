@@ -116,7 +116,7 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, c
   # Liquid phase derivatives (g/s)
   # Includes transport and reaction
   rxn = k * mcl
-  if counter==True:
+  if not counter:
      cvec = np.insert(ccl, 0, clin)
   else:
      v_l = - v_l
@@ -223,13 +223,13 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
    # Solve/integrate
    out = solve_ivp(rates, [0, max(times)], y0 = y0, 
                    t_eval = times, 
-                   args = (v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, counter),
+                   args = (v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, counter, recirc),
                    method = 'Radau')
-   # Set max_step=0.1 as last argument in the solver to get smooth curves that take longer time to simulate
    
    # Extract mass of compound [position, time]
    mcgt = out.y[0:nc]
    mclt = out.y[nc:(2 * nc)]
+   mctot = np.sum(mcgt,0) + np.sum(mclt,0) #total mass of compuond in the entire column as a function of time. 
 
    # Get concentrations vs. time
    # Gas
@@ -243,7 +243,7 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
    
    # Return results as a dictionary
    return {'gas_conc': ccgt, 'liq_conc': cclt, 'gas_mass': mcgt, 'liq_mass': mclt, 
-           'cell_pos': x, 'time': times, 'Kaw':Kaw, 
-           'inputs': args_in,
-           'pars': {'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga, 'Kaw': Kaw, 'alpha0': alpha0, 'Daw': Daw, 'y0':y0}}
+           'cell_pos': x, 'time': times, 'tot_mass' : mctot,
+           'inputs': args_in, 
+           'pars': {'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga, 'Kaw': Kaw, 'alpha0': alpha0, 'Daw': Daw}}
 

@@ -29,7 +29,7 @@ dens_l = 1000    # Liquid density (kg/m3)
 k = 0        # Reaction rate (1/s). Small because of inert carrier
                  # Reaction could be acid/base that changes the pH
 
-pH = (7.71 + 8.48) /2 
+pH = 8.07 
 
 # realistic pKa
 pKa = 7.
@@ -54,7 +54,7 @@ from Calibration_func import constant1,constant2
     #start and stop cycles are the lines in the excel that are imported. All other left out. 
     # note that the data is so that time goes from high to low, but the concentration follows the same pattern, so this should not matter.
     #output is "time" in h and "concentration" in g/m^3
-ex1=Data_reciever(filename='experiment_3.2.inlet.csv',startcycle=105,stopcycle=16800,a=constant1,b=constant2)
+ex1=Data_reciever(filename='experiment_3.2.inlet.csv',startcycle=120,stopcycle=16800,a=constant1,b=constant2)
 
 
 
@@ -91,7 +91,7 @@ pred1label= 'Model' #label on plots
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #Loading experimental data from experiment 2.1
-ex2=Data_reciever(filename='experiment_3.2.1.csv',startcycle=49,stopcycle=16800,a=constant1,b=constant2)
+ex2=Data_reciever(filename='experiment_3.2.1.csv',startcycle=75,stopcycle=16800,a=constant1,b=constant2)
 
 
 #plotting
@@ -108,7 +108,7 @@ plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.5)) #Moves legend out of plot
-plt.title('Long experiment')
+plt.title('Experiment 2.1')
 plt.show()
 
 #table with input paramters

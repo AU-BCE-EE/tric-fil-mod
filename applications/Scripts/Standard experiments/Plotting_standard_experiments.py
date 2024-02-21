@@ -10,13 +10,15 @@ import pandas as pd
 shutil.copy('../../../mod_funcs.py', '.')
 from mod_funcs import tfmod 
 
+# Choose experiment~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 # name of experiment (file named "experiment_first.second.x)
-first = '2'
+first = '4'
 second = '4'
 
 #parameters loaded. change name depending on experiment no.
 
-from lab_parameters_24 import pH1,pH2,pH3,cycle1,cycle2,cycle3,cycle4,cycle5,length 
+from lab_parameters_44 import pH1,pH2,pH3,cycle1,cycle2,cycle3,cycle4,cycle5,length 
 
 
 

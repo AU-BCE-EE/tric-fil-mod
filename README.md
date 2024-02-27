@@ -6,7 +6,7 @@ Model is currently under development.
 
 # Maintainer
 Sasha Hafner.
-Contact information here: <https://au.dk/sasha.hafner@bce>.
+Contact information here: <https://au.dk/sasha.hafner@bce.au.dk>.
 
 # Running demo
 In a console, browse to the latest subdirectory in `demos` and enter:

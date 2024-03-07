@@ -13,12 +13,12 @@ from mod_funcs import tfmod
 # Choose experiment~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # name of experiment (file named "experiment_first.second.x)
-first = '2'
-second = '1'
+first = '3'
+second = '4'
 
 #parameters loaded. change name depending on experiment no.
 
-from lab_parameters_21 import pH1,pH2,pH3,cycle1,cycle2,cycle3,cycle4,cycle5,length 
+from lab_parameters_34 import pH1,pH2,pH3,cycle1,cycle2,cycle3,cycle4,cycle5,length 
 
 
 
@@ -152,7 +152,7 @@ times = np.linspace(0, tt, nt) * 3600
 
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH1, temp = temp, dens_l = dens_l, times = times, recirc = True, counter = True)
+              pH = pH1, temp = temp, dens_l = dens_l, times = times, recirc = False, counter = True)
 pred1label= first+'.'+second+'.1 model' #label on plots
 
 
@@ -160,14 +160,14 @@ pred1label= first+'.'+second+'.1 model' #label on plots
 
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH2, temp = temp, dens_l = dens_l, times = times, recirc = True, counter = True)
+              pH = pH2, temp = temp, dens_l = dens_l, times = times, recirc = False, counter = True)
 pred2label=first+'.'+second+'.2 model'
 
 
 
 pred3 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH3, temp = temp, dens_l = dens_l, times = times, recirc = True, counter = True)
+              pH = pH3, temp = temp, dens_l = dens_l, times = times, recirc = False, counter = True)
 pred3label=first+'.'+second+'.3 model'
 
 

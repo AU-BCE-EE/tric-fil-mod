@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 #specify excel file and destination
-filename = 'experiment_2.1.1'
+filename = 'experiment_5.5.inlet2'
 
 excel_file_path = '..//Raw_data/'+filename+'.xlsx'
 csv_destination_path = '..//Processed_data/'+filename+'.csv'
@@ -20,10 +20,10 @@ csv_destination_path = '..//Processed_data/'+filename+'.csv'
 sheetname1 = 'Time   Cycle'
 columnname1 = 'Relative Time'
 sheetname2 = 'Raw signal intensities'
-columnname21 = 'm/z 37.00 ch4'
+columnname21 = 'm/z 37.00 ch8'
 columnname22 = 'm/z 21.00 ch1'
 sheetname3 = 'Concentration'
-columnname3 = 'm/z 35.00 ch3'
+columnname3 = 'm/z 35.00 ch7'
 
 
 #Loading the columns of interest

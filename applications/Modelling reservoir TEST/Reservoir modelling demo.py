@@ -52,14 +52,14 @@ times = np.linspace(0, tt, nt) * 3600
 #v_g=60m/h, v_l=0.4m/h
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = 60/3600, v_l = 0.4/3600, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH, temp = temp, dens_l = dens_l, times = times, recirc = True)
+              pH = pH, temp = temp, dens_l = dens_l, times = times,recirc = True)
 pred1label = 'v_res = 0'
 
 # Blue
 #v_g=60m/h, v_l=1m/h
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = 60/3600, v_l = 0.4/3600, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH, temp = temp, dens_l = dens_l, times = times, v_res = 0.0018, recirc = True)
+              pH = pH, temp = temp, dens_l = dens_l, times = times, v_res = 0.0018, counter = False, recirc = True)
 pred2label = 'v_res = 0.0018m3'
 
 # Green line in plots

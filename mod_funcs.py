@@ -89,7 +89,7 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, v
   ccg = mcg / vol_gas
   ccl = mcl / vol_liq
   
-  dmcr = 0
+  dmcr = 0.0
 
   # Get reservoir liquid phase concentration to use at inlet if recirc = True. 
   #If recirc = false, reservoir concentration is still calculated but not used
@@ -142,8 +142,7 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, v
  
 
   # Combine gas and liquid and reservoir
-  dm = np.concatenate([dmg, dml])
-  dm = np.append (dm, dmcr)
+  dm = np.concatenate([dmg, dml, np.array([dmcr])])
 
   #if t / 3600 > 0.05:
   #    breakpoint()
@@ -234,8 +233,7 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
    mcr = ccr * v_res
 
    # Initial state variable array
-   y0 = np.concatenate([mcg, mcl])
-   y0 = np.append (y0, mcr)
+   y0 = np.concatenate([mcg, mcl, np.array([mcr])])
 
    # Ionization fraction
    alpha0 = 1 / (1 + 10**(pH - pKa))

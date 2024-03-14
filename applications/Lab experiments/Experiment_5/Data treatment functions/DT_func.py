@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 #specify excel file and destination
-filename = 'experiment_5.5.inlet2'
+filename = 'experiment_5.6.inlet2'
 
 excel_file_path = '..//Raw_data/'+filename+'.xlsx'
 csv_destination_path = '..//Processed_data/'+filename+'.csv'

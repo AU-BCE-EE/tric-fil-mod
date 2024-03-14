@@ -14,7 +14,7 @@ cycle1 = 97
 cycle2 = 65
 cycle3 = 53
 cycle4 = 38
-length = 1984
+length = 941
 
 #volume of reservoir in mL
 vol = 500

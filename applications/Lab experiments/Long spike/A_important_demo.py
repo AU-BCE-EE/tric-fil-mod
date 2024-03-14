@@ -34,6 +34,10 @@ pH = 8.07
 # realistic pKa
 pKa = 7.
 
+#Calculating the cross sectional area, and dividing the volume by it, as required by the model
+vol = 1200 #volume of reservoir in mL
+area = (0.19/2)**2 * 3.14159265
+v_res = vol * 10**(-6) / area
 
 ## Breakthrough time calculated from volume (V=14.5L), Por_g=0.8 and volumetric velocities 25l/min (v_g=53m/h) 
 # . 37.5L/min (v_g=79m/h) and 50 L/min (v_g=106m/h)
@@ -78,7 +82,7 @@ times = np.linspace(0, tt, nt) * 3600
 #v_g=60m/h, v_l=0.4m/h
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = 102/3600, v_l = 0.4/3600, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH, temp = temp, dens_l = dens_l, times = times)
+              pH = pH, temp = temp, dens_l = dens_l, times = times,v_res = v_res, recirc = True, counter = True)
 pred1label= 'Model' #label on plots
 
 

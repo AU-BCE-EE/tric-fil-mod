@@ -29,7 +29,7 @@ dens_l = 1000    # Liquid density (kg/m3)
 k = 0         # Reaction rate (1/s). Small because of inert carrier.
                     #Reaction could be acid/base that changes the pH
 
-pH = 7.
+pH = 8.
 
 # realistic pKa
 pKa = 7.
@@ -52,29 +52,29 @@ times = np.linspace(0, tt, nt) * 3600
 #v_g=60m/h, v_l=0.4m/h
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = 60/3600, v_l = 0.4/3600, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH, temp = temp, dens_l = dens_l, times = times,recirc = True)
+              pH = pH, temp = temp, dens_l = dens_l, times = times,recirc = True, counter = False)
 pred1label = 'v_res = 0'
 
 # Blue
 #v_g=60m/h, v_l=1m/h
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = 60/3600, v_l = 0.4/3600, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH, temp = temp, dens_l = dens_l, times = times, v_res = 0.0018, counter = False, recirc = True)
-pred2label = 'v_res = 0.0018m3'
+              pH = pH, temp = temp, dens_l = dens_l, times = times, v_res = 0.01, counter = False, recirc = True)
+pred2label = 'v_res = 0.01m3/m2'
 
 # Green line in plots
 #v_g=100m/h, v_l=0.4m/h
 pred3 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = 60/3600, v_l = 0.4/3600, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH, temp = temp, dens_l = dens_l, times = times, v_res = 0.01, recirc = True)
-pred3label = 'v_res = 0.01m3'
+              pH = pH, temp = temp, dens_l = dens_l, times = times, v_res = 0.1, recirc = True, counter = False)
+pred3label = 'v_res = 0.1m3/m2'
 
 # Orange line in plots
 #v_g=100m/h, v_l=1m/h
 pred4 = tfmod(L = L, por_g = por_g, por_l = por_l,v_g = 60/3600, v_l = 0.4/3600, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH, temp = temp, dens_l = dens_l, times = times, v_res = 0.1, recirc = True)
-pred4label = 'v_res = 0.1m3'
+              pH = pH, temp = temp, dens_l = dens_l, times = times, v_res = 1, recirc = True, counter = False)
+pred4label = 'v_res = 1m3/m2'
 
 
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

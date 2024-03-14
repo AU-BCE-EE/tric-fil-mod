@@ -14,11 +14,11 @@ from mod_funcs import tfmod
 
 # name of experiment (file named "experiment_first.second.x)
 first = '5'
-second = '5'
+second = '6'
 
 #parameters loaded. change name depending on experiment no.
 
-from lab_parameters_55 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol 
+from lab_parameters_56 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol 
 
 
 
@@ -44,7 +44,6 @@ por_g = 0.77
 #Calculating the cross sectional area, and dividing the volume by it, as required by the model
 area = (0.19/2)**2 * 3.14159265
 v_res = vol * 10**(-6) / area
-
 
 
 k = 0       # Reaction rate (1/s). Small because of inert carrier

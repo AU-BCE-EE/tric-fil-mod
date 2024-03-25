@@ -7,18 +7,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-shutil.copy('../../../../mod_funcs.py', '.')
+shutil.copy('../../../../../../..//Modellering//2024.03.07/tric-fil-mod/mod_funcs.py', '.')
 from mod_funcs import tfmod 
 
 # Choose experiment~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # name of experiment (file named "experiment_first.second.x)
 first = '5'
-second = '1'
+second = '4'
 
 #parameters loaded. change name depending on experiment no.
 
-from lab_parameters_51 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol 
+from lab_parameters_54 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol 
 
 
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,7 +115,7 @@ cgin = pd.DataFrame({'time': t5*3600,
 
 clin = 0
 
-c_out = np.mean ([C2,C3],axis=0)
+c_out = np.mean([C2,C3],axis=0)
 
 # Times for model output in h
 tt = 0.35
@@ -149,7 +149,7 @@ results.to_csv('..//Compare_pH_data/experimental'+first+'.'+second+'.csv', heade
 
 
 
-results = pd.DataFrame ({'model':pred1['gas_conc'][nc - 1, :] , 'model time(h)':pred1['time'] / 3600 })
+results = pd.DataFrame ({'model':(pred1['gas_conc'][nc - 1, :]+pred2['gas_conc'][nc - 1, :])/2 , 'model time(h)':pred1['time'] / 3600 })
 
 results.to_csv('..//Compare_pH_data/model_'+first+'.'+second+'.csv', header = True, index=False)
 

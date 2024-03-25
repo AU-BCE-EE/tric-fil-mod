@@ -10,7 +10,7 @@ import pandas as pd
 import sys
 
 #specify excel file and destination
-filename = 'experiment_7.1.inlet2'
+filename = 'Background'
 
 excel_file_path = '..//Raw_data/'+filename+'.xlsx'
 csv_destination_path = '..//Processed_data/'+filename+'.csv'

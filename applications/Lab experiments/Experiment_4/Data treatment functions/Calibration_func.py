@@ -64,6 +64,7 @@ humid = mz37 / mz21
 correction = C_actual / (mz35)
 x=humid[startcyclecali:endcyclecali].values 
 y=correction[startcyclecali:endcyclecali].values    
+maxhumid = max(humid)
     
         
 def logcurve(h,a,b):#a and b is calibration parameters, h is humidity and c is correction factor

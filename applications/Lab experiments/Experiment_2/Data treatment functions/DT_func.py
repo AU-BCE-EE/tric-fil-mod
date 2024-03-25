@@ -7,9 +7,10 @@ Created on Fri Jan 19 11:00:48 2024
 
 import numpy as np
 import pandas as pd
+import sys
 
 #specify excel file and destination
-filename = 'experiment_2.1.1'
+filename = 'experiment_2.4.inlet2'
 
 excel_file_path = '..//Raw_data/'+filename+'.xlsx'
 csv_destination_path = '..//Processed_data/'+filename+'.csv'
@@ -40,11 +41,14 @@ mz35 = df3[columnname3]  #m/z 35 signal (H2S)
 #modifying and correction the raw data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-from Calibration_func import a,b    #import calibration parameters from calibration script
+from Calibration_func import a,b,maxhumid    #import calibration parameters from calibration script
 
 
 time =  t_s / 3600 #time in h
 humid = mz37 / mz21
+for i in range(len(humid)):
+    if humid[i] > maxhumid:
+        sys.exit('Error, the humidity is too high for this calibration')
 correction = a * np.log(humid) + b # correction factor, correcting for the amount of water
 
 H2S = mz35 * correction * 10**-6 * 1.01325 / (0.00008314*298) * 34.08088 # concentration of H2S in g/m^3

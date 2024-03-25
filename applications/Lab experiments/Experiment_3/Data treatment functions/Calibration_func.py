@@ -17,13 +17,13 @@ from scipy.optimize import curve_fit
 
 #start time
 startcyclecali=80 #Row of data where the calibration starts
-endcyclecali=100 #Row of data where the calibration ends
+endcyclecali=800 #Row of data where the calibration ends
 
 #actual concentration in ppm
 C_actual=40
 
 #specify excel file (put the excel file in Raw_data)
-filename = 'Calibration_23.01.24'
+filename = 'Calibration_09.02.24'
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -38,10 +38,10 @@ params=[0.008,-0.006]
 sheetname1 = 'Time   Cycle'
 columnname1 = 'Relative Time'
 sheetname2 = 'Raw signal intensities'
-columnname21 = 'm/z 37.00 ch4'
+columnname21 = 'm/z 37.00 ch8'
 columnname22 = 'm/z 21.00 ch1'
 sheetname3 = 'Concentration'
-columnname3 = 'm/z 35.00 ch3'
+columnname3 = 'm/z 35.00 ch7'
 
 
 #Loading the columns of interest
@@ -60,7 +60,8 @@ humid = mz37 / mz21
 
 correction = C_actual / (mz35)
 x=humid[startcyclecali:endcyclecali].values 
-y=correction[startcyclecali:endcyclecali].values    
+y=correction[startcyclecali:endcyclecali].values  
+maxhumid = max(humid)  
     
         
 def logcurve(h,a,b):#a and b is calibration parameters, h is humidity and c is correction factor
@@ -84,6 +85,6 @@ plt.plot(x,y,'o')
 plt.plot(x,yfit,label=('y= %1.5f'%copt[0]+'*ln(x) %1.5f'%copt[1]))
 plt.xlabel('m/z 37 / m/z 21')
 plt.ylabel('correction factor []')
-plt.title('Calibration Curve 23.01')
+plt.title('Calibration Curve 09.02')
 plt.legend(loc='lower right')
-plt.savefig('..//Plots/Calibration_23.01.24.png')
+plt.savefig('..//Plots/Calibration_09.02.24.png')

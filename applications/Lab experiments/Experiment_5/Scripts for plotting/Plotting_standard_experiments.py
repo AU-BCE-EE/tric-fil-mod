@@ -7,18 +7,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-shutil.copy('../../../../mod_funcs.py', '.')
+shutil.copy('../../../../../../..//Modellering//2024.03.07/tric-fil-mod/mod_funcs.py', '.')
 from mod_funcs import tfmod 
 
 # Choose experiment~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # name of experiment (file named "experiment_first.second.x)
 first = '5'
-second = '6'
+second = '7'
 
 #parameters loaded. change name depending on experiment no.
 
-from lab_parameters_56 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol 
+from lab_parameters_57 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol 
 
 
 

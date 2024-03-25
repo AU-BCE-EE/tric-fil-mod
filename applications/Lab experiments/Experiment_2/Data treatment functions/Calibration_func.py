@@ -17,7 +17,7 @@ from scipy.optimize import curve_fit
 
 #start time
 startcyclecali=80 #Row of data where the calibration starts
-endcyclecali=100 #Row of data where the calibration ends
+endcyclecali=300 #Row of data where the calibration ends
 
 #actual concentration in ppm
 C_actual=40
@@ -60,7 +60,8 @@ humid = mz37 / mz21
 
 correction = C_actual / (mz35)
 x=humid[startcyclecali:endcyclecali].values 
-y=correction[startcyclecali:endcyclecali].values    
+y=correction[startcyclecali:endcyclecali].values 
+maxhumid = max(humid)   
     
         
 def logcurve(h,a,b):#a and b is calibration parameters, h is humidity and c is correction factor
@@ -78,12 +79,12 @@ b=float(copt[1])
 
 
 
-#plotting
-yfit=logcurve(x,copt[0],copt[1])
-plt.plot(x,y,'o')
-plt.plot(x,yfit,label=('y= %1.5f'%copt[0]+'*ln(x) %1.5f'%copt[1]))
-plt.xlabel('m/z 37 / m/z 21')
-plt.ylabel('correction factor []')
-plt.title('Calibration Curve 23.01')
-plt.legend(loc='lower right')
-plt.savefig('..//Plots/Calibration_23.01.24.png')
+# #plotting
+# yfit=logcurve(x,copt[0],copt[1])
+# plt.plot(x,y,'o')
+# plt.plot(x,yfit,label=('y= %1.5f'%copt[0]+'*ln(x) %1.5f'%copt[1]))
+# plt.xlabel('m/z 37 / m/z 21')
+# plt.ylabel('correction factor []')
+# plt.title('Calibration Curve 23.01')
+# plt.legend(loc='lower right')
+# plt.savefig('..//Plots/Calibration_23.01.24.png')

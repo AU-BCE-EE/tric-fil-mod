@@ -14,11 +14,11 @@ from mod_funcs import tfmod
 
 # name of experiment (file named "experiment_first.second.x)
 first = '5'
-second = '7'
+second = '4'
 
 #parameters loaded. change name depending on experiment no.
 
-from lab_parameters_57 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol 
+from lab_parameters_54 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol 
 
 
 

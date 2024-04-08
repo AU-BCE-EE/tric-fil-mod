@@ -25,7 +25,7 @@ from lab_parameters_71 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # See notes in tfmod.py for more complete descriptions
 L = 0.51            # Filter length/depth (m) 
-nc = 200          # Number of model cells (layers)
+nc = 10          # Number of model cells (layers)
 cg0 = 0          # (g/m3)
 cl0 = 0          # (g/m3)
 henry = (0.56, 3500.)
@@ -135,8 +135,10 @@ C3= ex3['DMS concentration in g/m^3'][cycle3:cycle3+length+1500]
 
 c_in=np.mean([C1,C4],axis=0)
 
-cgin = pd.DataFrame({'time': t4*3600, 
-                     'cgin': c_in})
+
+
+# cgin = pd.DataFrame({'time': t4*3600, 
+#                      'cgin': c_in})
 
 clin = 0
 
@@ -149,7 +151,15 @@ times = np.linspace(0, tt, nt) * 3600
 
 # Scenarios ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+def piecewise_function(time):
+    if time < 300:
+        return 0.000254
+    else: 
+        return 0
 
+cgin = pd.DataFrame()
+cgin['time']=t4*3600
+cgin['concentration'] = cgin['time'].apply(piecewise_function)
 
 
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
@@ -180,7 +190,8 @@ plt.plot(t2,C2,label=first+'.'+second+'.1 experimental data')
 plt.plot(t3,C3,label=first+'.'+second+'.2 experimental data')
 plt.plot(t1,C1,label='inlet 1')
 plt.plot(t4,C4,label='inlet 2')
-plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :],color='k',label=pred1label)
+plt.plot(cgin['time']/3600,cgin['concentration'],label = 'inlet input for model')
+plt.plot(pred1['time'] / 3600, pred1['gas_conc'][0, :],color='k',label=pred1label)
 plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :],color='m',label=pred2label)
 plt.axvline(x=BT/60,linestyle='-',label=BTlabel) #breakthrough curve
 plt.axhline(y=0.000254,color='g',label='Expected inlet concentration')
@@ -219,3 +230,37 @@ plt.title('Experiment '+first+'.'+second+' DMS')
 # Save the figure
 plt.savefig('..//Plots/Inputs/Input_parameters_'+first+'.'+second+' DMS.png', bbox_inches='tight')
 
+
+# Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Profiles
+# Gas
+plt.clf()
+plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 1], label = 'Time:%1.0f'%times[1]+'s')
+plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 2], label = 'Time:%1.0f'%times[2]+'s')
+plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 25], label = 'Time:%1.0f'%times[25]+'s')
+plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 49], label = 'Time:%1.0f'%times[49]+'s')
+plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 50], label = 'Time:%1.0f'%times[50]+'s')
+plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 55], label = 'Time:%1.0f'%times[55]+'s')
+plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 60], label = 'Time:%1.0f'%times[60]+'s')
+plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 75], label = 'Time:%1.0f'%times[75]+'s')
+plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, nt - 1], label = 'Time:%1.0f'%times[nt-1]+'s')
+plt.xlabel('Location (m)')
+plt.ylabel('Compound conc. (g/m3)')
+plt.title('Gas Phase')
+plt.legend()
+plt.show()
+
+
+#Liquid
+plt.clf()
+plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 1], label = 'Time:%1.0f'%times[1]+'s')
+plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 25], label = 'Time:%1.0f'%times[25]+'s')
+plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 50], label = 'Time:%1.0f'%times[50]+'s')
+plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 75], label = 'Time:%1.0f'%times[75]+'s')
+plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 100], label = 'Time:%1.0f'%times[100]+'s')
+plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, nt - 1], label = 'Time:%1.0f'%times[nt-1]+'s')
+plt.xlabel('Location (m)')
+plt.ylabel('Compound conc. (g/m3)')
+plt.title('Liquid Phase')
+plt.legend()
+plt.show()

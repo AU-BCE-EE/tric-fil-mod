@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-shutil.copy('../../../../../../..//Modellering//2024.03.07/tric-fil-mod/mod_funcs.py', '.')
+shutil.copy('../..//Experiment_4/Scripts for plotting/mod_funcs.py', '.')
 from mod_funcs import tfmod 
 
 # Choose experiment~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -180,7 +180,7 @@ plt.plot(t2,C2,label=first+'.'+second+'.1 experimental data')
 plt.plot(t3,C3,label=first+'.'+second+'.2 experimental data')
 plt.plot(t1,C1,label='inlet 1')
 plt.plot(t4,C4,label='inlet 2')
-plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :],color='k',label=pred1label)
+plt.plot(pred1['time'] / 3600, pred1['gas_conc'][0, :],color='k',label=pred1label)
 plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :],color='m',label=pred2label)
 plt.axvline(x=BT/60,linestyle='-',label=BTlabel) #breakthrough curve
 plt.axhline(y=0.000196,color='g',label='Expected inlet concentration')

@@ -58,7 +58,7 @@ def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
 
 # Rates function
 # Arg order: time, state variable, then arguments
-def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, counter = True, recirc = False):
+def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, v_res, counter = True, recirc = False):
 
   # If time-variable concentrations coming in are given, get interpolated values
   if type(clin) is pd.core.frame.DataFrame:
@@ -80,25 +80,39 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, c
   # Number of cells (layers) (note integer division)
   nc = mc.shape[0] // 2
 
-  # Separate gas and liquid state variables (g) (g/m2)
+  # Separate gas, liquid and reservoir state variables (g) (g/m2)
   mcg = mc[0:nc]
   mcl = mc[nc:(2 * nc)]
+  mcr = mc[ (2*nc) : (2*nc)+1 ]
 
   # Concentrations (g/m3)
   ccg = mcg / vol_gas
   ccl = mcl / vol_liq
+  
+  dmcr = 0.0
 
-  # Get outlet liquid phase concentration to use at inlet if recirc = True
+  # Get reservoir liquid phase concentration to use at inlet if recirc = True. 
+  #If recirc = false, reservoir concentration is still calculated but not used
   if recirc:
       if counter:
-          oi = 0
+           oi = 0
       else:
-          oi = nc - 1
-      clin = ccl[oi]
+           oi = nc - 1
+      if v_res > 0:
+        clin = mcr / v_res
+        #reservoir derivative (g/s) 
+        dmcr = (ccl[oi] - (mcr / v_res)) * abs(v_l)
+      elif v_res == 0:
+          clin = ccl[oi]
+      else:
+          sys.exit('v_res is negative, must be a positive float or 0')
+          
+
 
   # Derivatives
   # Set up empty arrays
   dmg = dml = g2l = np.zeros(nc)
+
 
   # Common term, mass transfer into liquid phase (g/s)
   #g/s  1/s    m3(t)     ----g/m3(g)-----
@@ -115,6 +129,7 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, c
 
   # Liquid phase derivatives (g/s)
   # Includes transport and reaction
+  
   rxn = k * mcl
   if not counter:
      cvec = np.insert(ccl, 0, clin)
@@ -124,9 +139,12 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, c
 
   advec = - v_l * np.diff(cvec)
   dml = advec + g2l - rxn
+  
+ 
 
-  # Combine gas and liquid
+ # Combine gas and liquid and reservoir
   dm = np.concatenate([dmg, dml])
+  dm = np.append (dm, dmcr)
 
   #if t / 3600 > 0.05:
   #    breakpoint()
@@ -134,7 +152,7 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, c
   return dm
 
 # Model function
-def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pKa, pH, temp, dens_l, times, pres = 1., ssa = 1100, counter = True, recirc = False):
+def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pKa, pH, temp, dens_l, times, v_res = 0, ccr = 0, pres = 1., ssa = 1100, counter = True, recirc = False):
 
    ## Note that units are defined per 1 m2 filter cross-sectional (total) area 
    ## Below, where 2 sets of units are given this applies to the first case
@@ -158,6 +176,8 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
    # pres = total pressure (bar?)
    # ssa = particle specific surface area (m2 surface / m3 bulk volume)
    # count = Boolean for countercurrent flow
+   # v_res = volume of a reservoir for the liquid phase (m3 pr m2 cross sectional area)
+   #ccr = initial concentration in the reservoir (g/m3)
 
    # Save input arguments for echoing in output
    args_in = locals()
@@ -212,9 +232,11 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
    ccl = np.full((nc), cl0)
    mcg = ccg * vol_gas
    mcl = ccl * vol_liq
+   mcr = ccr * v_res
 
-   # Initial state variable array
+  # Initial state variable array
    y0 = np.concatenate([mcg, mcl])
+   y0 = np.append (y0, mcr)
 
    # Ionization fraction
    alpha0 = 1 / (1 + 10**(pH - pKa))
@@ -223,12 +245,13 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, henry, pK
    # Solve/integrate
    out = solve_ivp(rates, [0, max(times)], y0 = y0, 
                    t_eval = times, 
-                   args = (v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, counter, recirc),
+                   args = (v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, v_res, counter, recirc),
                    method = 'Radau')
    
    # Extract mass of compound [position, time]
    mcgt = out.y[0:nc]
    mclt = out.y[nc:(2 * nc)]
+   mcrt = out.y[(2 * nc):(2 * nc)+1]
    mctot = np.sum(mcgt,0) + np.sum(mclt,0) #total mass of compuond in the entire column as a function of time. 
 
    # Get concentrations vs. time

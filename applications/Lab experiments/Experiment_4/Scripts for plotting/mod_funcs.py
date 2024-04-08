@@ -59,6 +59,7 @@ def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
 # Rates function
 # Arg order: time, state variable, then arguments
 def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, v_res, counter = True, recirc = False):
+    
 
   # If time-variable concentrations coming in are given, get interpolated values
   if type(clin) is pd.core.frame.DataFrame:
@@ -75,7 +76,6 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, v
   elif not (type(cgin) is int or type(cgin) is float):
     sys.exit('Error: cgin input must be float, integer, numpy array, or a pandas data frame, but is none of these')
 
-  #breakpoint()
   
   # Number of cells (layers) (note integer division)
   nc = mc.shape[0] // 2
@@ -112,17 +112,21 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, v
   # Derivatives
   # Set up empty arrays
   dmg = dml = g2l = np.zeros(nc)
-
-
+  
+  
+  
+   
   # Common term, mass transfer into liquid phase (g/s)
   #g/s  1/s    m3(t)     ----g/m3(g)-----
   g2l = Kga * vol_tot * (ccg - ccl * Daw) 
+  
 
   # Gas phase derivatives (g/s)
   # No reaction in gas phase
   # cddiff = concentration double difference (g/m3)
   # cvec = array of cell concentrations with inlet air added
   # rxn = 0 for as phase
+  
   cvec = np.insert(ccg, 0, cgin)
   advec = - v_g * np.diff(cvec)
   dmg = advec - g2l
@@ -130,12 +134,12 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, v
   # Liquid phase derivatives (g/s)
   # Includes transport and reaction
   rxn = k * mcl
+  
   if not counter:
      cvec = np.insert(ccl, 0, clin)
   else:
      v_l = - v_l
-     cvec = np.insert(ccl, nc, clin)
-
+     cvec = np.append(ccl, clin)
   advec = - v_l * np.diff(cvec)
   dml = advec + g2l - rxn
   
@@ -146,7 +150,7 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, v
   dm = np.append (dm, dmcr)
 
   #if t / 3600 > 0.05:
-  #    breakpoint()
+
 
   return dm
 

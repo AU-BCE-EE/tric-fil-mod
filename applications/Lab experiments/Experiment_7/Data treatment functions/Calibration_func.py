@@ -81,7 +81,7 @@ b=float(copt[1])
 # #plotting
 # yfit=logcurve(x,copt[0],copt[1])
 # plt.plot(x,y,'o')
-# plt.plot(x,yfit,label=('y= %1.5f'%copt[0]+'*ln(x) %1.5f'%copt[1]))
+plt.plot(x,yfit,label=('y= %1.5f'%copt[0]+'*ln(x) %1.5f'%copt[1]))
 # plt.xlabel('m/z 37 / m/z 21')
 # plt.ylabel('correction factor []')
 # plt.title('Calibration Curve 06.03')

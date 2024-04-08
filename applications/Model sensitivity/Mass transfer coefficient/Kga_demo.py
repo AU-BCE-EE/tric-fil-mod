@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-shutil.copy('../../../../mod_funcs.py', '.')
+shutil.copy('../..//Lab experiments/Experiment_4/Scripts for plotting/mod_funcs.py', '.')
 from mod_funcs import tfmod 
 
 

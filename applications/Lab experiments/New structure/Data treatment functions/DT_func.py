@@ -1,0 +1,119 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jan 19 11:00:48 2024
+
+@author: Mortensen
+"""
+
+import numpy as np
+import pandas as pd
+import sys
+import importlib
+
+#making loops that go through all experiments 2 to 6
+for n in range (2,7):
+    first = str(n)
+    if first == '5':
+        no_exp = 8
+    else:
+        no_exp = 5
+    
+    for m in range (1,no_exp):
+        second = str(m)
+        if int(first) < 5:
+            ending = ['inlet1','inlet2','1','2','3']
+        else:
+            ending = ['inlet1','inlet2','1','2']
+        
+        #specify excel file and destination
+        for p in ending:
+            filename = 'experiment_'+first+'.'+second+'.'+p
+
+            excel_file_path = '..//Raw_data/'+filename+'.xlsx'
+            csv_destination_path = '..//Processed_data/'+filename+'.csv'
+            
+            #finding the calibration date from the master sheet
+            df = pd.read_excel('../../Master_spreadsheet.xlsx', sheet_name = 'Data')
+            
+            params = df[df['key'] == float(first)+0.1*float(second)]
+            
+            caldate = params['Calibration'].values[0]
+            
+            #selecting the right channels for each instrument
+            if caldate == '23.01.24':
+                sheetname1 = 'Time   Cycle'
+                columnname1 = 'Relative Time'
+                sheetname2 = 'Raw signal intensities'
+                columnname21 = 'm/z 37.00 ch4'
+                columnname22 = 'm/z 21.00 ch1'
+                sheetname3 = 'Concentration'
+                columnname3 = 'm/z 35.00 ch3'
+            else: 
+                sheetname1 = 'Time   Cycle'
+                columnname1 = 'Relative Time'
+                sheetname2 = 'Raw signal intensities'
+                columnname21 = 'm/z 37.00 ch8'
+                columnname22 = 'm/z 21.00 ch1'
+                sheetname3 = 'Concentration'
+                columnname3 = 'm/z 35.00 ch7'
+            
+            
+            #Loading the columns of interest
+            df1 = pd.read_excel(excel_file_path,sheet_name=sheetname1)
+            df2 = pd.read_excel(excel_file_path,sheet_name=sheetname2)
+            df3 = pd.read_excel(excel_file_path,sheet_name=sheetname3)
+
+            #defining the raw data
+            t_s = df1[columnname1] #time in s
+            mz37 = df2[columnname21] # m/z 37 signal (water cluster)
+            mz21 = df2[columnname22] # m/z 21 signal (H3O+)
+            mz35 = df3[columnname3]  #m/z 35 signal (H2S)
+
+            #modifying and correction the raw data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            
+            caldate_for_module = caldate.replace('.', '_')
+            calibration_file = f'Calibration_{caldate_for_module}'
+            module = importlib.import_module(calibration_file)
+            a = module.a
+            b = module.b
+            maxhumid = module.maxhumid
+
+
+            time =  t_s / 3600 #time in h
+            humid = mz37 / mz21
+            for i in range(len(humid)):
+                if humid[i] > maxhumid:
+                    sys.exit('Error, the humidity is too high for this calibration')
+            correction = a * np.log(humid) + b # correction factor, correcting for the amount of water
+
+            H2S = mz35 * correction * 10**-6 * 1.01325 / (0.00008314*298) * 34.08088 # concentration of H2S in g/m^3
+
+            results = pd.DataFrame ({'Concentration in g/m^3':H2S , 'Time in h':time})
+
+            results.to_csv(csv_destination_path, header = True, index=False)
+
+print('done')
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+

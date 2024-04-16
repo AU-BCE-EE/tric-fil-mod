@@ -36,9 +36,9 @@ def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
     Fr = v_l * v_l * ssa / g
     We = v_l * v_l * dens_l / (sigm_l * ssa)
     
-    
-    ae = ssa * (1.0-2.71828**(-1.45 * (sigm_c / sigm_l)**0.75 *
-                            Re**0.1 * Fr**-0.05 * We**0.2))
+    ae = 800
+    #ae = ssa * (1.0-2.71828**(-1.45 * (sigm_c / sigm_l)**0.75 *
+    #                        Re**0.1 * Fr**-0.05 * We**0.2))
    
    #gas phase resistance
     kg = dp_emp * (v_g * dens_g / (ssa * visc_g))**0.7 \

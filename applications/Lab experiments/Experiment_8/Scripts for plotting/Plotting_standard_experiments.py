@@ -1,24 +1,24 @@
 # Comparison of numerical Python model to closed-form solution with instant partitioning (equilibrium everywhere)
 
 # Import necessary packages ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-import sys
+import shutil
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sys.path.append("../../../../..")  # Add the directory containing mod_funcs.py to Python path
+shutil.copy('../../../../mod_funcs.py', '.')
 from mod_funcs import tfmod 
 
 # Choose experiment~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # name of experiment (file named "experiment_first.second.x)
-first = '5'
-second = '5'
+first = '3'
+second = '4'
 
 #parameters loaded. change name depending on experiment no.
 
-from lab_parameters_55 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol 
+from lab_parameters_34 import pH1,pH2,pH3,cycle1,cycle2,cycle3,cycle4,cycle5,length 
 
 
 
@@ -32,18 +32,33 @@ henry = (0.1, 2000.)
 temp = 21.       # (degrees C)
 dens_l = 1000    # Liquid density (kg/m3)
 
-#Setting the liquid and gas velocities and the porosity and water content
+#Setting the liquid and gas velocities using the experiment number (second number in the file name)
+if second == '1' or second == '4':
+    v_g = 53/3600
+elif second =='2' or second == '3':
+    v_g = 106/3600
+else: print ('Error in reading "second"')
 
-v_g = 53/3600
-v_l = 0.4/3600
+if second == '1' or second == '2':
+    v_l = 0.4/3600
+elif second =='4' or second == '3':
+    v_l = 1.2/3600
+else: print ('Error in reading "second"')
 
-por_l = 0.21
-por_g = 0.77
-
-
-#Calculating the cross sectional area, and dividing the volume by it, as required by the model
-area = (0.19/2)**2 * 3.14159265
-v_res = vol * 10**(-6) / area
+# Porosity and water content definition
+if second == '1':
+    por_l = 0.21
+    por_g = 0.77
+elif second == '2':
+    por_l = 0.23
+    por_g = 0.75
+elif second == '3':
+    por_l = 0.24
+    por_g = 0.74
+elif second == '4':
+    por_l = 0.23
+    por_g = 0.75
+else: print ('Error in reading "second"') 
 
 
 k = 0       # Reaction rate (1/s). Small because of inert carrier
@@ -61,9 +76,13 @@ pKa = 7.
 BT1 = 14.5*por_g/50
 BT2 = 14.5*por_g/25
 BTlabel='Theoretical Breakthrough curve)'
-BT=BT2
 
-
+if second == '1' or second == '4':
+    BT = BT2
+elif second =='2' or second == '3':
+    BT= BT1
+else: 
+    print ('error in definition of "second". Has to be a string containing the numbers 1,2,3 or 4')
 
 
 
@@ -79,6 +98,7 @@ ex5 = pd.read_csv('..//Processed_data/experiment_'+first+'.'+second+'.inlet2.csv
 # The three repetitions
 ex2 = pd.read_csv('..//Processed_data/experiment_'+first+'.'+second+'.1.csv', sep = ',')
 ex3 = pd.read_csv('..//Processed_data/experiment_'+first+'.'+second+'.2.csv', sep = ',')
+ex4 = pd.read_csv('..//Processed_data/experiment_'+first+'.'+second+'.3.csv', sep = ',')
 
 
 # selecting and normalising the time, because all data files are started before the H2S
@@ -88,19 +108,21 @@ t1norm = ex1['Time in h'] - ex1['Time in h'][cycle1]
 t1 = t1norm [cycle1:cycle1+length]
 C1= ex1['Concentration in g/m^3'][cycle1:cycle1+length]
 
-t5norm = ex5['Time in h'] - ex5['Time in h'][cycle4]
-t5 = t5norm [cycle4:cycle4+length]
-C5= ex5['Concentration in g/m^3'][cycle4:cycle4+length]
+t5norm = ex5['Time in h'] - ex5['Time in h'][cycle5]
+t5 = t5norm [cycle5:cycle5+length]
+C5= ex5['Concentration in g/m^3'][cycle5:cycle5+length]
 
 t2norm = ex2['Time in h'] - ex2['Time in h'][cycle2]
-t2 = t2norm [cycle2:cycle2+length+1000]
-C2= ex2['Concentration in g/m^3'][cycle2:cycle2+length+1000]
+t2 = t2norm [cycle2:cycle2+length+500]
+C2= ex2['Concentration in g/m^3'][cycle2:cycle2+length+500]
 
 t3norm = ex3['Time in h'] - ex3['Time in h'][cycle3]
-t3 = t3norm [cycle3:cycle3+length+1000]
-C3= ex3['Concentration in g/m^3'][cycle3:cycle3+length+1000]
+t3 = t3norm [cycle3:cycle3+length+500]
+C3= ex3['Concentration in g/m^3'][cycle3:cycle3+length+500]
 
-
+t4norm = ex4['Time in h'] - ex4['Time in h'][cycle4]
+t4 = t4norm [cycle4:cycle4+length+500]
+C4= ex4['Concentration in g/m^3'][cycle4:cycle4+length+500]
 
 
     
@@ -126,20 +148,27 @@ times = np.linspace(0, tt, nt) * 3600
 # Scenarios ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
+
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
-              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, counter = True, recirc = True)
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              pH = pH1, temp = temp, dens_l = dens_l, times = times, recirc = False, counter = True)
 pred1label= first+'.'+second+'.1 model' #label on plots
 
 
 
 
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
-              pH = pH2, temp = temp, dens_l = dens_l, times = times, v_res = v_res, counter = True, recirc = True)
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              pH = pH2, temp = temp, dens_l = dens_l, times = times, recirc = False, counter = True)
 pred2label=first+'.'+second+'.2 model'
 
 
+
+pred3 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              pH = pH3, temp = temp, dens_l = dens_l, times = times, recirc = False, counter = True)
+pred3label=first+'.'+second+'.3 model'
 
 
 
@@ -151,10 +180,12 @@ pred2label=first+'.'+second+'.2 model'
 
 plt.plot(t2,C2,label=first+'.'+second+'.1 experimental data')
 plt.plot(t3,C3,label=first+'.'+second+'.2 experimental data')
+plt.plot(t4,C4,label=first+'.'+second+'.3 experimental data')
 plt.plot(t1,C1,label='inlet 1')
 plt.plot(t5,C5,label='inlet 2')
 plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :],color='k',label=pred1label)
 plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :],color='m',label=pred2label)
+plt.plot(pred3['time'] / 3600, pred3['gas_conc'][nc - 1, :],color='b',label=pred3label)
 plt.axvline(x=BT/60,linestyle='-',label=BTlabel) #breakthrough curve
 plt.axhline(y=0.055,color='g',label='Expected inlet concentration')
 plt.xlabel('Time (h)')
@@ -163,13 +194,13 @@ plt.legend()
 plt.xlim(0)
 plt.ylim(0)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
-plt.title('Experiment '+first+'.'+second+' (pH = '+str((pH1+pH2)/2)+')')
+plt.title('Experiment '+first+'.'+second)
 plt.savefig('..//Plots/Experiment '+first+'.'+second+'.png', bbox_inches='tight')
 
 #table with input paramters
 #import module
 from tabulate import tabulate
-parameters = [['v_g', pred1['inputs']['v_g']], ['v_l', pred1['inputs']['v_l']], ['pH1', pH1], ['pH2', pH2], ['k', k], ['countercurrent', pred1['inputs']['counter']],
+parameters = [['v_g', pred1['inputs']['v_g']], ['v_l', pred1['inputs']['v_l']], ['pH1', pH1], ['pH2', pH2], ['pH3', pH3], ['k', k], ['countercurrent', pred1['inputs']['counter']],
               ['recirculation', pred1['inputs']['recirc']], ['water content', por_l], ['porosity', por_g], ['temperature', temp], ['v_res', pred1['inputs']['v_res']]]
 head = ['parameter', 'value']
 table = tabulate(parameters, headers=head, tablefmt="grid")

@@ -1,24 +1,25 @@
 # Comparison of numerical Python model to closed-form solution with instant partitioning (equilibrium everywhere)
 
 # Import necessary packages ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-import shutil
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-shutil.copy('../../../../mod_funcs.py', '.')
-from mod_funcs import tfmod 
+sys.path.append("../../../../..")  # Add the directory containing mod_funcs.py to Python path
+
+from mod_funcs import tfmod
 
 # Choose experiment~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # name of experiment (file named "experiment_first.second.x)
 first = '5'
-second = '7'
+second = '5'
 
 #parameters loaded. change name depending on experiment no.
 
-from lab_parameters_57 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol 
+from lab_parameters_55 import pH1,pH2,cycle1,cycle2,cycle3,cycle4,length,vol 
 
 
 
@@ -127,28 +128,28 @@ times = np.linspace(0, tt, nt) * 3600
 
 
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 0.02, k = k, k2 = k2, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = 0.004, henry = henry, pKa = pKa, 
               pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, counter = True, recirc = True)
-pred1label= 'k=0, Kga = 0.02' #label on plots
+pred1label= 'k2=0.004' #label on plots
 
 
 
 
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k2, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = 1, henry = henry, pKa = pKa, 
               pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, counter = True, recirc = True)
-pred2label='k=0,Kga = onda'
+pred2label='k2=1'
 
 
-# pred3 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-#               cl0 = cl0, cgin = cgin, clin = clin, Kga = 0.1, k = k, k2 = k2, henry = henry, pKa = pKa, 
-#               pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, counter = True, recirc = True)
-# pred3label= 'k=0, Kga=0.1' #label on plots
+pred3 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = 10, henry = henry, pKa = pKa, 
+              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, counter = True, recirc = True)
+pred3label= 'k2=10' #label on plots
 
-# pred4 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-#               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = 0.01, henry = henry, pKa = pKa, 
-#               pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, counter = True, recirc = True)
-# pred4label= 'k=0, k2=0.01' #label on plots
+pred4 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = 0.01, henry = henry, pKa = pKa, 
+              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, counter = True, recirc = True)
+pred4label= 'k2=0.01' #label on plots
 
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -173,7 +174,7 @@ plt.xlim(0)
 plt.ylim(0)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second+' (pH = '+str((pH1+pH2)/2)+')')
-plt.savefig('..//Plots/Experiment '+first+'.'+second+'profiles.png', bbox_inches='tight')
+plt.savefig('..//Plots/Experiment '+first+'.'+second+'vary_k2.png', bbox_inches='tight')
 
 #table with input paramters
 #import module
@@ -199,80 +200,80 @@ table_ax.set_fontsize(10)
 plt.title('Experiment '+first+'.'+second)
 
 # Save the figure
-plt.savefig('..//Plots/Inputs/Input_parameters_'+first+'.'+second+'profiles.png', bbox_inches='tight')
+plt.savefig('..//Plots/Inputs/Input_parameters_'+first+'.'+second+'vary_k2.png', bbox_inches='tight')
 
 
+print(pred1['pars'])
+
+# # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# # Profiles
+# # Gas
+# plt.clf()
+# plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 45], label = 'Time:%1.0f'%times[45]+'s')
+# plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 50], label = 'Time:%1.0f'%times[50]+'s')
+# plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 52], label = 'Time:%1.0f'%times[52]+'s')
+# plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 53], label = 'Time:%1.0f'%times[53]+'s')
+# plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 54], label = 'Time:%1.0f'%times[54]+'s')
+# plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 55], label = 'Time:%1.0f'%times[55]+'s')
+# plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 56], label = 'Time:%1.0f'%times[56]+'s')
+# plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 58], label = 'Time:%1.0f'%times[58]+'s')
+# plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 65], label = 'Time:%1.0f'%times[65]+'s')
+# plt.xlabel('Location (m)')
+# plt.ylabel('Compound conc. (g/m3)')
+# plt.title('Gas Phase')
+# plt.legend()
+# plt.savefig('..//Plots/Experiment '+first+'.'+second+'gasprofile_onda.png', bbox_inches='tight')
 
 
-# Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Profiles
-# Gas
-plt.clf()
-plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 45], label = 'Time:%1.0f'%times[45]+'s')
-plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 50], label = 'Time:%1.0f'%times[50]+'s')
-plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 52], label = 'Time:%1.0f'%times[52]+'s')
-plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 53], label = 'Time:%1.0f'%times[53]+'s')
-plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 54], label = 'Time:%1.0f'%times[54]+'s')
-plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 55], label = 'Time:%1.0f'%times[55]+'s')
-plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 56], label = 'Time:%1.0f'%times[56]+'s')
-plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 58], label = 'Time:%1.0f'%times[58]+'s')
-plt.plot(pred2['cell_pos'], pred2['gas_conc'][:, 65], label = 'Time:%1.0f'%times[65]+'s')
-plt.xlabel('Location (m)')
-plt.ylabel('Compound conc. (g/m3)')
-plt.title('Gas Phase')
-plt.legend()
-plt.savefig('..//Plots/Experiment '+first+'.'+second+'gasprofile_onda.png', bbox_inches='tight')
+# #Liquid
+# plt.clf()
+# plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 45], label = 'Time:%1.0f'%times[45]+'s')
+# plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 50], label = 'Time:%1.0f'%times[50]+'s')
+# plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 52], label = 'Time:%1.0f'%times[52]+'s')
+# plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 53], label = 'Time:%1.0f'%times[53]+'s')
+# plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 54], label = 'Time:%1.0f'%times[54]+'s')
+# plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 55], label = 'Time:%1.0f'%times[55]+'s')
+# plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 56], label = 'Time:%1.0f'%times[56]+'s')
+# plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 58], label = 'Time:%1.0f'%times[58]+'s')
+# plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 65], label = 'Time:%1.0f'%times[65]+'s')
+# plt.xlabel('Location (m)')
+# plt.ylabel('Compound conc. (g/m3)')
+# plt.title('Liquid Phase')
+# plt.legend()
+# plt.savefig('..//Plots/Experiment '+first+'.'+second+'liqprofile_onda.png', bbox_inches='tight')
 
 
-#Liquid
-plt.clf()
-plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 45], label = 'Time:%1.0f'%times[45]+'s')
-plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 50], label = 'Time:%1.0f'%times[50]+'s')
-plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 52], label = 'Time:%1.0f'%times[52]+'s')
-plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 53], label = 'Time:%1.0f'%times[53]+'s')
-plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 54], label = 'Time:%1.0f'%times[54]+'s')
-plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 55], label = 'Time:%1.0f'%times[55]+'s')
-plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 56], label = 'Time:%1.0f'%times[56]+'s')
-plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 58], label = 'Time:%1.0f'%times[58]+'s')
-plt.plot(pred2['cell_pos'], pred2['liq_conc'][:, 65], label = 'Time:%1.0f'%times[65]+'s')
-plt.xlabel('Location (m)')
-plt.ylabel('Compound conc. (g/m3)')
-plt.title('Liquid Phase')
-plt.legend()
-plt.savefig('..//Plots/Experiment '+first+'.'+second+'liqprofile_onda.png', bbox_inches='tight')
+# # Gas
+# plt.clf()
+# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 45], label = 'Time:%1.0f'%times[45]+'s')
+# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 50], label = 'Time:%1.0f'%times[50]+'s')
+# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 52], label = 'Time:%1.0f'%times[52]+'s')
+# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 53], label = 'Time:%1.0f'%times[53]+'s')
+# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 54], label = 'Time:%1.0f'%times[54]+'s')
+# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 55], label = 'Time:%1.0f'%times[55]+'s')
+# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 56], label = 'Time:%1.0f'%times[56]+'s')
+# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 58], label = 'Time:%1.0f'%times[58]+'s')
+# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 65], label = 'Time:%1.0f'%times[65]+'s')
+# plt.xlabel('Location (m)')
+# plt.ylabel('Compound conc. (g/m3)')
+# plt.title('Gas Phase')
+# plt.legend()
+# plt.savefig('..//Plots/Experiment '+first+'.'+second+'gasprofile_Kga0.02.png', bbox_inches='tight')
 
 
-# Gas
-plt.clf()
-plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 45], label = 'Time:%1.0f'%times[45]+'s')
-plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 50], label = 'Time:%1.0f'%times[50]+'s')
-plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 52], label = 'Time:%1.0f'%times[52]+'s')
-plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 53], label = 'Time:%1.0f'%times[53]+'s')
-plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 54], label = 'Time:%1.0f'%times[54]+'s')
-plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 55], label = 'Time:%1.0f'%times[55]+'s')
-plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 56], label = 'Time:%1.0f'%times[56]+'s')
-plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 58], label = 'Time:%1.0f'%times[58]+'s')
-plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 65], label = 'Time:%1.0f'%times[65]+'s')
-plt.xlabel('Location (m)')
-plt.ylabel('Compound conc. (g/m3)')
-plt.title('Gas Phase')
-plt.legend()
-plt.savefig('..//Plots/Experiment '+first+'.'+second+'gasprofile_Kga0.02.png', bbox_inches='tight')
-
-
-#Liquid
-plt.clf()
-plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 45], label = 'Time:%1.0f'%times[45]+'s')
-plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 50], label = 'Time:%1.0f'%times[50]+'s')
-plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 52], label = 'Time:%1.0f'%times[52]+'s')
-plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 53], label = 'Time:%1.0f'%times[53]+'s')
-plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 54], label = 'Time:%1.0f'%times[54]+'s')
-plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 55], label = 'Time:%1.0f'%times[55]+'s')
-plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 56], label = 'Time:%1.0f'%times[56]+'s')
-plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 58], label = 'Time:%1.0f'%times[58]+'s')
-plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 65], label = 'Time:%1.0f'%times[65]+'s')
-plt.xlabel('Location (m)')
-plt.ylabel('Compound conc. (g/m3)')
-plt.title('Liquid Phase')
-plt.legend()
-plt.savefig('..//Plots/Experiment '+first+'.'+second+'liqprofile_Kga0.02.png', bbox_inches='tight')
+# #Liquid
+# plt.clf()
+# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 45], label = 'Time:%1.0f'%times[45]+'s')
+# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 50], label = 'Time:%1.0f'%times[50]+'s')
+# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 52], label = 'Time:%1.0f'%times[52]+'s')
+# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 53], label = 'Time:%1.0f'%times[53]+'s')
+# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 54], label = 'Time:%1.0f'%times[54]+'s')
+# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 55], label = 'Time:%1.0f'%times[55]+'s')
+# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 56], label = 'Time:%1.0f'%times[56]+'s')
+# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 58], label = 'Time:%1.0f'%times[58]+'s')
+# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 65], label = 'Time:%1.0f'%times[65]+'s')
+# plt.xlabel('Location (m)')
+# plt.ylabel('Compound conc. (g/m3)')
+# plt.title('Liquid Phase')
+# plt.legend()
+# plt.savefig('..//Plots/Experiment '+first+'.'+second+'liqprofile_Kga0.02.png', bbox_inches='tight')

@@ -13,6 +13,9 @@ sys.path.append("../../../../..")  # Add the directory containing mod_funcs.py t
 
 from mod_funcs import tfmod
 
+#select and define experimental data ______________________________________________
+#selecting the experiment number and loading parameters from the master spreadsheet
+
 first = '5'
 second = '4'
 
@@ -74,24 +77,6 @@ else: print ('Error in reading "no"')
 
 
 
-
-
-
-## Breakthrough time calculated from volume (V=14.5L), Por_g and flow rate (L/min, from calibration of mass flow controllers)
-
-BT1 = 14.5*por_g/54.2766
-BT2 = 14.5*por_g/27.2991
-BTlabel='Theoretical Breakthrough curve)'
-
-if no == 1 or no == 4:
-    BT = BT2
-elif no ==2 or no == 3:
-    BT= BT1
-else: 
-    print ('error in definition of "no". Has to be a string containing the numbers 1,2,3 or 4')
-
-
-
 # Inlet concentrations load in from data treatment and definition
 
 ex1 = pd.read_csv('../..//Processed_data/experiment_'+first+'.'+second+'.inlet1.csv', sep = ',')
@@ -101,7 +86,7 @@ ex1 = pd.read_csv('../..//Processed_data/experiment_'+first+'.'+second+'.inlet1.
 ex5 = pd.read_csv('../..//Processed_data/experiment_'+first+'.'+second+'.inlet2.csv', sep = ',')
 
 
-# The three repetitions
+# The three repetitions of outlet data
 ex2 = pd.read_csv('../..//Processed_data/experiment_'+first+'.'+second+'.1.csv', sep = ',')
 ex3 = pd.read_csv('../..//Processed_data/experiment_'+first+'.'+second+'.2.csv', sep = ',')
 if not cycle4 == 'NaN':
@@ -132,7 +117,7 @@ t3norm = ex3['Time in h'] - ex3['Time in h'][cycle3]
 t3 = t3norm [cycle3:cycle3+length+500]
 C3= ex3['Concentration in g/m^3'][cycle3:cycle3+length+500]
 
-
+#Making an average of the outlet measurements for Output data and the optimization
 if not cycle4 == 'NaN':
      minlen = min(len(C2),len(C3),len(C4))
      C2_cut = ex2['Concentration in g/m^3'].rolling(window=5,center = True).mean()[cycle2:cycle2+minlen]
@@ -146,6 +131,24 @@ else:
      c_out = np.mean([C2_cut,C3_cut],axis=0)
   
 
+
+
+## Breakthrough time calculated from volume (V=14.5L), Por_g and flow rate (L/min, from calibration of mass flow controllers)
+
+BT1 = 14.5*por_g/54.2766
+BT2 = 14.5*por_g/27.2991
+BTlabel='Theoretical Breakthrough curve)'
+
+if no == 1 or no == 4:
+    BT = BT2
+elif no ==2 or no == 3:
+    BT= BT1
+else: 
+    print ('error in definition of "no". Has to be a string containing the numbers 1,2,3 or 4')
+
+
+#Defining inputs for the model______________________________________________________________________
+#Time and inlet concentrations
 c_in=np.mean([C1,C5],axis=0)
 
 cgin = pd.DataFrame({'time': t5*3600, 
@@ -172,21 +175,11 @@ pH = (pH1 +pH2)/2
 # realistic pKa
 pKa = 7.
 
-
+# Optimization function________________________________________________________________
 #avoid the sharp point when the H2S is turned off
-x1 = t2norm [cycle2:cycle2+400]*3600
-x2 = t2norm [cycle2+410:cycle2+minlen] *3600    
-    
-#x = np.concatenate((x1,x2))
-
-y1 = c_out [0:400]
-y2 = c_out [410:minlen]
- 
-#y = np.concatenate((y1,y2))
-x=x1
-y=y1
-
-initial = [0.04,0.01]
+x = t2norm [cycle2:cycle2+400]*3600
+y = c_out [0:400]
+initial = [0.05,0.01]
 
 def optimization (t,Kga,k):
     L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin,henry, pKa, pH , temp, dens_l, v_res,times
@@ -202,9 +195,9 @@ def optimization (t,Kga,k):
 
 copt,ccov = curve_fit(optimization,x,y,p0=initial, maxfev = 100000,ftol=0.00000000000001,xtol=0.00000000001)
 
+#Both maxfev, xtol and ftol can be erased or changed
 
-
-
+# Models for plotting_______________________________________________________________________________________
 Kga = float(copt[0])
 k = float(copt[1])
 
@@ -222,7 +215,7 @@ pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc
               pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = True, counter = True)
 pred2label= first+'.'+second+'.k=0, onda model' #label on
 
-
+#Plotting__________________________________________________________________________________________________
 plt.clf()
 plt.plot(t2,C2,label=first+'.'+second+'.1 experimental data')
 plt.plot(t3,C3,label=first+'.'+second+'.2 experimental data')
@@ -270,63 +263,5 @@ plt.title('Experiment '+first+'.'+second)
 
 # Save the figure
 plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'optimized Kga and k.png', bbox_inches='tight')
- 
-#  #Taking the average of the outlet measurements
-
- 
-#  #export data as CSV files
-
- 
-# results = pd.DataFrame ({'experimental':c_out , 'experimental time (h)':t3norm [cycle3:cycle3+minlen] })
-
-# results.to_csv('Output data/experimental'+first+'.'+second+'Kga '+pred1['inputs']['Kga']+'.csv', header = True, index=False)
 
 
-
-# results = pd.DataFrame ({'model':pred1['gas_conc'][nc - 1, :] , 'model time(h)':pred1['time'] / 3600 })
-
-# results.to_csv('Output data/model_'+first+'.'+second+'Kga '+pred1['inputs']['Kga']+'.csv', header = True, index=False)
-
- 
-
-
-# # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# # Profiles
-
-
-# # Gas
-# plt.clf()
-# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 1], label = 'Time:%1.0f'%times[1]+'s')
-# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 20], label = 'Time:%1.0f'%times[20]+'s')
-# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 40], label = 'Time:%1.0f'%times[40]+'s')
-# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 60], label = 'Time:%1.0f'%times[60]+'s')
-# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 80], label = 'Time:%1.0f'%times[80]+'s')
-# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 100], label = 'Time:%1.0f'%times[100]+'s')
-# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 120], label = 'Time:%1.0f'%times[120]+'s')
-# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 160], label = 'Time:%1.0f'%times[160]+'s')
-# plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 199], label = 'Time:%1.0f'%times[199]+'s')
-# plt.xlabel('Location (m)')
-# plt.ylabel('Compound conc. (g/m3)')
-# plt.title('Gas Phase')
-# plt.legend()
-# plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
-# plt.savefig('Plots/Experiment '+first+'.'+second+'Kga '+pred1['inputs']['Kga']+' gasprofile.png', bbox_inches='tight')
-
-
-# #Liquid
-# plt.clf()
-# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 1], label = 'Time:%1.0f'%times[1]+'s')
-# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 20], label = 'Time:%1.0f'%times[20]+'s')
-# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 40], label = 'Time:%1.0f'%times[40]+'s')
-# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 60], label = 'Time:%1.0f'%times[60]+'s')
-# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 80], label = 'Time:%1.0f'%times[80]+'s')
-# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 100], label = 'Time:%1.0f'%times[100]+'s')
-# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 120], label = 'Time:%1.0f'%times[120]+'s')
-# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 160], label = 'Time:%1.0f'%times[160]+'s')
-# plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 199], label = 'Time:%1.0f'%times[199]+'s')
-# plt.xlabel('Location (m)')
-# plt.ylabel('Compound conc. (g/m3)')
-# plt.title('Liquid Phase')
-# plt.legend()
-# plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
-# plt.savefig('Plots/Experiment '+first+'.'+second+'Kga '+pred1['inputs']['Kga']+' liqprofile.png', bbox_inches='tight')

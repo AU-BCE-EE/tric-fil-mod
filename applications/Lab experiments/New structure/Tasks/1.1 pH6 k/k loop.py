@@ -5,7 +5,6 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from scipy.optimize import curve_fit
 
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -17,7 +16,7 @@ from mod_funcs import tfmod
 #selecting the experiment number and loading parameters from the master spreadsheet
 
 first = '5'
-second = '4'
+second = '7'
 
 #parameters loaded. File name changes depending on experiment no.
 file_path = '../../../Master_spreadsheet.xlsx'
@@ -171,49 +170,34 @@ cl0 = 0          # (g/m3)
 henry = (0.1, 2000.)
 temp = 21.       # (degrees C)
 dens_l = 1000    # Liquid density (kg/m3)
-pH = (pH1 +pH2)/2
 # realistic pKa
 pKa = 7.
 
-# Optimization function________________________________________________________________
-#avoid the sharp point when the H2S is turned off
-x = t2norm [cycle2:cycle2+400]*3600
-y = c_out [0:400]
-initial = [0.05,0.01]
 
-def optimization (t,Kga,k):
-    L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin,henry, pKa, pH , temp, dens_l, v_res,times
+k_list = np.linspace(0.0025, 0.25,5) 
+
+
+preds = []
+pred_labels = []
+
+for i, k in enumerate(k_list):
+    pred = tfmod(L=L, por_g=por_g, por_l=por_l, v_g=v_g, v_l=v_l, nc=nc, cg0=cg0, cl0=cl0,
+                 cgin=cgin, clin=clin, Kga='onda', k=k, k2=k, henry=henry, pKa=pKa,
+                 pH=pH1, temp=temp, dens_l=dens_l, times=times, v_res=v_res, 
+                 recirc=True, counter=True)
     
-    pred_opt= tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-                  cl0 = cl0, cgin = cgin, clin = clin, Kga = Kga, k = k, k2 = 0.01, henry = henry, pKa = pKa, 
-                  pH = (pH1 +pH2)/2, temp = temp, dens_l = dens_l, times = t, v_res = v_res, recirc = True, counter = True)
-    c = pred_opt['gas_conc'][nc - 1,:]
-           
-    return c
-
-
-
-copt,ccov = curve_fit(optimization,x,y,p0=initial, maxfev = 100000,ftol=0.00000000000001,xtol=0.00000000001)
-
-#Both maxfev, xtol and ftol can be erased or changed
-
-# Models for plotting_______________________________________________________________________________________
-Kga = float(copt[0])
-k = float(copt[1])
-
-
+    label = f"{first}.{second}.k {k} model"
+    
+    preds.append(pred)
+    pred_labels.append(label)
+    
+    
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = Kga , k = k, k2 = k, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = 0, k2 = 0, henry = henry, pKa = pKa, 
               pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = True, counter = True)
-pred1label= first+'.'+second+'.k and Kga optimized model' #label on
+pred1label= first+'.'+second+'. k=0 model' #label on
 
 
-k=0
-
-pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
-              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = True, counter = True)
-pred2label= first+'.'+second+'.k=0, onda model' #label on
 
 #Plotting__________________________________________________________________________________________________
 plt.clf()
@@ -223,8 +207,9 @@ if not cycle4 == 'NaN':
     plt.plot(t4,C4,label=first+'.'+second+'.3 experimental data')
 plt.plot(t1,C1,label='inlet 1')
 plt.plot(t5,C5,label='inlet 2')
-plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :],color='k',label=pred1label)
-plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :],label=pred2label)
+for pred, label in zip(preds, pred_labels):
+    plt.plot(pred['time'] / 3600, pred['gas_conc'][nc - 1, :], label=label)
+plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :],label=pred1label)
 plt.axvline(x=BT/60,linestyle='-',label=BTlabel) #breakthrough curve
 plt.axhline(y=0.0596,color='g',label='Expected inlet concentration') # Average of two inlet concentrations of 43.2 and 42.3. These were for low and high gas flow rate respectively
 plt.xlabel('Time (h)')
@@ -234,8 +219,7 @@ plt.xlim(0,0.35)
 plt.ylim(0,0.07)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second)
-plt.show()
-plt.savefig('Plots/Experiment '+first+'.'+second+'optimized Kga and k.png', bbox_inches='tight')
+plt.savefig('Plots/Experiment '+first+'.'+second+'k loop.png', bbox_inches='tight')
 plt.close()
 
 #table with input paramters
@@ -262,6 +246,6 @@ table_ax.set_fontsize(10)
 plt.title('Experiment '+first+'.'+second)
 
 # Save the figure
-plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'optimized Kga and k.png', bbox_inches='tight')
+plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'baseline parameters.png', bbox_inches='tight')
 
 

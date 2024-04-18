@@ -190,7 +190,7 @@ for a in range (2,7):
         
         
         
-        
+        #Plotting gas phase concentrations as a function of time_____________________________________________________________
         
         plt.clf()
         plt.plot(t2,C2,label=first+'.'+second+'.1 experimental data')
@@ -215,7 +215,7 @@ for a in range (2,7):
         plt.savefig('..//Plots/Experiment '+first+'.'+second+'.png', bbox_inches='tight')
         plt.close()
 
-        #table with input paramters
+        #table with input paramters____________________________________________________________________________________
         #import module
         from tabulate import tabulate
         parameters = [['v_g', pred1['inputs']['v_g']], ['v_l', pred1['inputs']['v_l']], ['pH1', pH1], ['pH2', pH2], ['pH3', pH3], ['k', k], ['countercurrent', pred1['inputs']['counter']],
@@ -241,7 +241,7 @@ for a in range (2,7):
         # Save the figure
         plt.savefig('..//Plots/Inputs/Input_parameters_'+first+'.'+second+'.png', bbox_inches='tight')
         
-        #Taking the average of the outlet measurements
+        #Taking the average of the outlet measurements and exporting to csv______________________________________
       
         
         #export data as CSV files
@@ -271,6 +271,51 @@ for a in range (2,7):
         results = pd.DataFrame ({'model':mod_out , 'model time(h)':pred1['time'] / 3600 })
 
         results.to_csv('..//Output data/model_'+first+'.'+second+'.csv', header = True, index=False)
+        
+        #Profiles_________________________________________________________________________________________________
+        
+        # Gas
+        plt.clf()
+        plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 1], label = 'Time:%1.0f'%times[1]+'s')
+        plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 20], label = 'Time:%1.0f'%times[20]+'s')
+        plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 40], label = 'Time:%1.0f'%times[40]+'s')
+        plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 60], label = 'Time:%1.0f'%times[60]+'s')
+        plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 80], label = 'Time:%1.0f'%times[80]+'s')
+        plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 100], label = 'Time:%1.0f'%times[100]+'s')
+        plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 120], label = 'Time:%1.0f'%times[120]+'s')
+        plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 160], label = 'Time:%1.0f'%times[160]+'s')
+        plt.plot(pred1['cell_pos'], pred1['gas_conc'][:, 199], label = 'Time:%1.0f'%times[199]+'s')
+        plt.xlabel('Location (m)')
+        plt.ylabel('Compound conc. (g/m3)')
+        plt.title('Gas Phase')
+        plt.legend()
+        plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
+        plt.savefig('..//Plots/Experiment '+first+'.'+second+' gasprofile.png', bbox_inches='tight')
+        plt.close()
+
+
+        #Liquid
+        plt.clf()
+        plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 1], label = 'Time:%1.0f'%times[1]+'s')
+        plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 20], label = 'Time:%1.0f'%times[20]+'s')
+        plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 40], label = 'Time:%1.0f'%times[40]+'s')
+        plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 60], label = 'Time:%1.0f'%times[60]+'s')
+        plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 80], label = 'Time:%1.0f'%times[80]+'s')
+        plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 100], label = 'Time:%1.0f'%times[100]+'s')
+        plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 120], label = 'Time:%1.0f'%times[120]+'s')
+        plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 160], label = 'Time:%1.0f'%times[160]+'s')
+        plt.plot(pred1['cell_pos'], pred1['liq_conc'][:, 199], label = 'Time:%1.0f'%times[199]+'s')
+        plt.xlabel('Location (m)')
+        plt.ylabel('Compound conc. (g/m3)')
+        plt.title('Liquid Phase')
+        plt.legend()
+        plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
+        plt.savefig('../Plots/Experiment '+first+'.'+second+' liqprofile.png', bbox_inches='tight')
+        plt.close()
+        
+
+
+
 
         
 

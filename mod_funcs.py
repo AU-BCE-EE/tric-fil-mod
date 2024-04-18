@@ -60,6 +60,79 @@ def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
 
     return Kga
 
+def individual (pH, temp, henry, pKa, dens_l, kg, kl, ae):
+    R = 0.083144    # Gas constant (L bar / K-mol)
+    TK = temp + 273.15
+    kh = henry[0] * math.exp(henry[1] * (1/TK - 1/298.15)) # mol/kg-bar as liq:gas
+    kh = kh * dens_l / 1000                                # mol/L-bar
+    Kaw = 1 / (kh * R * TK)                                # Neutral air-water distribution
+    # alpha 0 (fraction as uncharged species)
+    alpha0 = 1 / (1 + 10**(pH - pKa))
+    Daw = alpha0 * Kaw
+   
+    Rtot = 1 / (kg * ae) + Daw / (kl * ae)
+    Kga = 1 / Rtot
+
+    return Kga
+
+def ae_onda (por_g, ssa, temp, dens_l, v_l):
+    g = 9.81        # m / sec^2
+    sigm_c = 0.75   # critical surface tension
+    sigm_l = 0.0073 # surface tension
+
+    TK = temp + 273.15
+
+    visc_l = -2.55E-5 * TK + 8.51E-3
+    Re = dens_l * v_l / (ssa * visc_l)
+    Fr = v_l * v_l * ssa / g
+    We = v_l * v_l * dens_l / (sigm_l * ssa)
+   
+    ae = ssa * (1.0-2.71828**(-1.45 * (sigm_c / sigm_l)**0.75 *
+                            Re**0.1 * Fr**-0.05 * We**0.2))
+    return ae    
+       
+
+def kg_onda (por_g, ssa, temp, pres, dens_l,v_l,v_g):
+    # Hard-wired constants
+    Dg = 1.16E-5    # gas diffusion coefficient in m2 / sec; compound specific
+    R = 0.083144    # Gas constant (L bar / K-mol)
+    mw_g = 28.97    # Air (gas mix) molecular weight (molar mass) (g/mol)
+
+    dp = 6 * (1 - por_g) / ssa  # characteristic packing length
+
+    if dp < 15:
+        dp_emp = 2.0
+    else:
+        dp_emp = 5.23
+
+    TK = temp + 273.15
+
+    dens_g = pres * mw_g / (R * TK) # g/L = kg/m3
+    visc_g = 9.1E-8 * TK - 1.16E-5   # empirical relation for gas viscosity vs TK
+   
+   
+    #gas phase resistance
+    kg = dp_emp * (v_g * dens_g / (ssa * visc_g))**0.7 \
+        * (visc_g / (dens_g * Dg))**(1 / 3) * (ssa * dp)**-2 * ssa * Dg
+    return kg
+    
+def kl_onda (por_g, ssa, temp, dens_l, v_l, ae):
+    # Hard-wired constants
+    g = 9.81        # m / sec^2
+    Dliq = 1.89E-9  # liquid diffusion coefficient
+    dp = 6 * (1 - por_g) / ssa  # characteristic packing length
+
+    TK = temp + 273.15
+
+    visc_l = -2.55E-5 * TK + 8.51E-3
+   
+    #liquid phase resistance
+    kl = 0.0051 * (v_l * dens_l / (ae * visc_l))**(2/3) * (visc_l / (dens_l * Dliq))**(-0.5) * (ssa * dp)**0.4 * (dens_l / (visc_l * g))**(-1/3)
+    return kl
+
+
+           
+
 # Rates function
 # Arg order: time, state variable, then arguments
 def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, k2 , Kga, Daw, alpha0, v_res, counter = True, recirc = False):
@@ -104,8 +177,9 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, k2 , Kga, D
            oi = nc - 1
       if v_res > 0:
         clin = mcr / v_res
+        rxnr = k * mcr * alpha0 + k2 * mcr * (1-alpha0)
         #reservoir derivative (g/s) 
-        dmcr = (ccl[oi] - (mcr / v_res)) * abs(v_l)
+        dmcr = (ccl[oi] - (mcr / v_res) - rxnr) * abs(v_l)
       elif v_res == 0:
           clin = ccl[oi]
       else:
@@ -157,7 +231,7 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, k2 , Kga, D
   return dm
 
 # Model function
-def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, k2, henry, pKa, pH, temp, dens_l, times, v_res = 0, ccr = 0, pres = 1., ssa = 1100, counter = True, recirc = False):
+def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, k2, henry, pKa, pH, temp, dens_l, times, kg='onda', kl='onda', ae='onda', v_res = 0, ccr = 0, pres = 1., ssa = 1100, counter = True, recirc = False):
 
    ## Note that units are defined per 1 m2 filter cross-sectional (total) area 
    ## Below, where 2 sets of units are given this applies to the first case
@@ -191,10 +265,28 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, k2, henry
    # Constants
    # Ideal gas constant (L bar / K-mol)
    R = 0.083144 
+   
+   
+   
+   
+   
 
    # Caclulate Kga if requested
    if type(Kga) is str and Kga.lower() == 'onda':
+      ae=ae_onda(por_g, ssa, temp, dens_l, v_l)
+      kg=kg_onda(por_g, ssa, temp, pres, dens_l,v_l,v_g)
+      kl=kl_onda(por_g, ssa, temp, dens_l, v_l, ae)
       Kga = Kga_onda(pH = pH, temp = temp, henry = henry, pKa = pKa, pres = pres, ssa = ssa, v_g = v_g, v_l = v_l, por_g = por_g, dens_l = dens_l)
+   elif type(Kga) is str and Kga.lower() == 'individual':
+       if type(ae) is str and ae.lower() == 'onda':
+           ae=ae_onda(por_g, ssa, temp, dens_l, v_l)
+       if type(kg) is str and kg.lower() == 'onda':
+           kg=kg_onda(por_g, ssa, temp, pres, dens_l,v_l,v_g)
+       if type(kl) is str and kl.lower() == 'onda':
+           kl=kl_onda(por_g, ssa, temp, dens_l, v_l, ae)
+       Kga = individual (pH=pH, temp=temp, henry=henry, pKa=pKa, dens_l=dens_l, kg=kg, kl=kl, ae=ae)
+      
+          
 
    # Retention time (s)
    rt_gas = L * por_g / v_g
@@ -217,6 +309,8 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, k2, henry
    kh = henry[0] * math.exp(henry[1] * (1/TK - 1/298.15)) # mol/kg-bar as liq:gas
    kh = kh * dens_l / 1000                                # mol/L-bar
    Kaw = 1 / (kh * R * TK)                                # dimensionless, gas:liq, e.g., g/L / g/L or g/m3 per g/m3
+   
+         
    
    # Create cells
    x = np.linspace(0, L, nc + 1)  # nc + 1 values
@@ -274,5 +368,5 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, k2, henry
    return {'gas_conc': ccgt, 'liq_conc': cclt, 'gas_mass': mcgt, 'liq_mass': mclt, 
            'cell_pos': x, 'time': times, 'tot_mass' : mctot,
            'inputs': args_in, 
-           'pars': {'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga, 'Kaw': Kaw, 'alpha0': alpha0, 'Daw': Daw}}
+           'pars': {'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga, 'Kaw': Kaw, 'alpha0': alpha0, 'Daw': Daw, 'ae':ae,'kg':kg,'kl':kl}}
 

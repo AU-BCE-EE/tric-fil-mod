@@ -182,7 +182,7 @@ y = c_out [0:400]
 initial = [0.05,0.01]
 
 def optimization (t,Kga,k):
-    L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin,henry, pKa, pH , temp, dens_l, v_res,times
+    L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin,henry, pKa, pH , temp, dens_l, v_res,times # import parameters for the model into the optimization definition
     
     pred_opt= tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
                   cl0 = cl0, cgin = cgin, clin = clin, Kga = Kga, k = k, k2 = 0.01, henry = henry, pKa = pKa, 

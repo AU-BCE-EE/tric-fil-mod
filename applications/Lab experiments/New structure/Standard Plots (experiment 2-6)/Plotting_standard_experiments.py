@@ -95,7 +95,7 @@ for a in range (2,7):
 
         BT1 = 14.5*por_g/54.2766
         BT2 = 14.5*por_g/27.2991
-        BTlabel='Theoretical Breakthrough curve)'
+        BTlabel='Theoretical Breakthrough curve'
 
         if no == 1 or no == 4:
             BT = BT2
@@ -172,21 +172,26 @@ for a in range (2,7):
         temp = 21.       # (degrees C)
         dens_l = 1000    # Liquid density (kg/m3)
         
+        if first == '3':
+            recirc = False
+        else: 
+            recirc = True
+        
         pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
                       cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
-                      pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = True, counter = True)
+                      pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = recirc, counter = True)
         pred1label= first+'.'+second+'.1 model' #label on
         
         pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
                       cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
-                      pH = pH2, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = True, counter = True)
+                      pH = pH2, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = recirc, counter = True)
         pred2label= first+'.'+second+'.2 model' #label on
         
         if not cycle4 == 'NaN':
            pred3 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
                          cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2= k, henry = henry, pKa = pKa, 
-                         pH = pH3, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = True, counter = True)
-           pred3label= first+'.'+second+'.1 model' #label on 
+                         pH = pH3, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = recirc, counter = True)
+           pred3label= first+'.'+second+'.3 model' #label on 
         
         
         
@@ -218,8 +223,8 @@ for a in range (2,7):
         #table with input paramters____________________________________________________________________________________
         #import module
         from tabulate import tabulate
-        parameters = [['v_g', pred1['inputs']['v_g']], ['v_l', pred1['inputs']['v_l']], ['pH1', pH1], ['pH2', pH2], ['pH3', pH3], ['k', k], ['countercurrent', pred1['inputs']['counter']],
-                      ['recirculation', pred1['inputs']['recirc']], ['water content', por_l], ['porosity', por_g], ['temperature', temp], ['v_res', pred1['inputs']['v_res']]]
+        parameters = [['v_g [m/s]', "{:.4f}".format (pred1['inputs']['v_g'])], ['v_l [m/s]',"{:.6f}".format (pred1['inputs']['v_l'])], ['pH1', "{:.2f}".format(pH1)], ['pH2', "{:.2f}".format(pH2)], ['pH3',"{:.2f}".format (pH3)], ['k [1/s]', "{:.3f}".format(k)], ['countercurrent', pred1['inputs']['counter']],
+                      ['recirculation', pred1['inputs']['recirc']], ['water content [m^3/m^3]', "{:.2f}".format(por_l)], ['porosity [m^3/m^3]', "{:.2f}".format(por_g)], ['temperature [deg. C]', "{:.0f}".format(temp)], ['v_res [m^3/m^2]', "{:.4f}".format(pred1['inputs']['v_res'])]]
         head = ['parameter', 'value']
         table = tabulate(parameters, headers=head, tablefmt="grid")
 

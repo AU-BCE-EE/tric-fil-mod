@@ -5,7 +5,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from scipy.optimize import curve_fit
+from scipy.optimize import least_squares
 
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,34 +176,40 @@ pH = (pH1 +pH2)/2
 pKa = 7.
 
 # Optimization function________________________________________________________________
-#avoid the sharp point when the H2S is turned off
-x = t2norm [cycle2:cycle2+400]*3600
-y = c_out [0:400]
-initial = [0.05,0.01]
 
-def optimization (t,Kga,k):
-    L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin,henry, pKa, pH , temp, dens_l, v_res,times
-    
+Kga = 0
+times = t2norm [cycle2:cycle2+minlen]*3600
+c_meas = c_out 
+
+def res_calc(x):
+    L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin,henry, pKa, pH , temp, dens_l, v_res, times, c_meas # import parameters for the model into the optimization definition
+
+    Kga = x[0]
+    k = x[1]
+
     pred_opt= tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
                   cl0 = cl0, cgin = cgin, clin = clin, Kga = Kga, k = k, k2 = 0.01, henry = henry, pKa = pKa, 
-                  pH = (pH1 +pH2)/2, temp = temp, dens_l = dens_l, times = t, v_res = v_res, recirc = True, counter = True)
+                  pH = (pH1 +pH2)/2, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = True, counter = True)
     c = pred_opt['gas_conc'][nc - 1,:]
+    r = c - c_meas
            
-    return c
+    return r
+
+
+sol = least_squares(res_calc, [0.007, 0.1], xtol = 3e-16, ftol = 3e-16, gtol = 3e-16, diff_step = 10)
+
+copt = sol['x']
 
 
 
-copt,ccov = curve_fit(optimization,x,y,p0=initial, maxfev = 100000,ftol=0.00000000000001,xtol=0.00000000001)
-
-#Both maxfev, xtol and ftol can be erased or changed
 
 # Models for plotting_______________________________________________________________________________________
-Kga = float(copt[0])
-k = float(copt[1])
+Kga_fit = float(copt[0])
+k_fit = float(copt[1])
 
 
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = Kga , k = k, k2 = k, henry = henry, pKa = pKa, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = Kga_fit , k = k_fit, k2 = 0.01, henry = henry, pKa = pKa, 
               pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = True, counter = True)
 pred1label= first+'.'+second+'.k and Kga optimized model' #label on
 
@@ -234,14 +240,15 @@ plt.xlim(0,0.35)
 plt.ylim(0,0.07)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second)
-plt.savefig('Plots/Experiment '+first+'.'+second+'optimized Kga and k.png', bbox_inches='tight')
+plt.savefig('Plots/Experiment '+first+'.'+second+'optimized Kga and k IG [0.07, 0.1].png', bbox_inches='tight')
 plt.close()
 
 #table with input paramters
 #import module
 from tabulate import tabulate
-parameters = [['v_g', pred1['inputs']['v_g']], ['v_l', pred1['inputs']['v_l']], ['pH1', pH1], ['pH2', pH2], ['pH3', pH3], ['k', k], ['countercurrent', pred1['inputs']['counter']],
-              ['recirculation', pred1['inputs']['recirc']], ['water content', por_l], ['porosity', por_g], ['temperature', temp], ['v_res', pred1['inputs']['v_res']]]
+parameters = [['v_g', pred1['inputs']['v_g']], ['v_l', pred1['inputs']['v_l']], ['pH1', pH1], ['pH2', pH2], ['pH3', pH3], ['countercurrent', pred1['inputs']['counter']],
+              ['recirculation', pred1['inputs']['recirc']], ['water content', por_l], ['porosity', por_g], ['temperature', temp], ['v_res', pred1['inputs']['v_res']],
+              ['Kga_fit' , Kga_fit], ['Kga_onda',pred2['pars']['Kga']],['k_fit', k_fit], ['k',k]]
 head = ['parameter', 'value']
 table = tabulate(parameters, headers=head, tablefmt="grid")
 
@@ -261,6 +268,6 @@ table_ax.set_fontsize(10)
 plt.title('Experiment '+first+'.'+second)
 
 # Save the figure
-plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'optimized Kga and k.png', bbox_inches='tight')
+plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'optimized Kga and k IG [0.07, 0.1].png', bbox_inches='tight')
 
 

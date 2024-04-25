@@ -1,4 +1,4 @@
-# Comparison of numerical Python model to closed-form solution with instant partitioning (equilibrium everywhere)
+ # Comparison of numerical Python model to closed-form solution with instant partitioning (equilibrium everywhere)
 
 # Import necessary packages ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import sys
@@ -9,7 +9,7 @@ from scipy.optimize import least_squares
 
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sys.path.append("../../../..")  # Add the directory containing mod_funcs.py to Python path
+sys.path.append("../../../../..")  # Add the directory containing mod_funcs.py to Python path
 from mod_funcs import tfmod 
 
 
@@ -24,9 +24,9 @@ modelresults_dict = {}
 exp_no1 = 4
 exp_no2 = 7
 
-IG_kl = 0.000002
-IG_k = 0
-IG_k2 = 0
+IG_kl = 0.1
+IG_k = 0.1
+IG_k2 = 0.1
 diff_step = 10
     
 for i in [exp_no1,exp_no2]:
@@ -204,9 +204,9 @@ def res_calc(x):
     
     #Define wat is in each position in the answer array x
 
-    kl = x[0]
-    k = x[1]
-    k2 = x[2]
+    kl = abs(x[0])
+    k = abs(x[1])
+    k2 = abs(x[2])
     
     #Model number 1 + residue calculation
     pred_opt1= tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
@@ -234,9 +234,9 @@ copt = sol['x']
 
 
 # Models for plotting_______________________________________________________________________________________
-kl_fit = float(copt[0])
-k_fit = float(copt[1])
-k2_fit = float(copt[2])
+kl_fit = abs(float(copt[0]))
+k_fit = abs(float(copt[1]))
+k2_fit = abs(float(copt[2]))
 
 #First experiment___________________________________________________________________________________________
 second = str(exp_no1)

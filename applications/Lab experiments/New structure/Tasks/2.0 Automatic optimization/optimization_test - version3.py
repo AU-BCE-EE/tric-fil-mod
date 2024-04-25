@@ -183,9 +183,9 @@ c_meas = c_out
 def res_calc(x):
     L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin,henry, pKa, pH , temp, dens_l, v_res, times, c_meas # import parameters for the model into the optimization definition
 
-    kl = x[0]
-    k = x[1]
-    k2 = x[2]
+    kl = abs(x[0])
+    k = abs(x[1])
+    k2 = abs(x[2])
 
     pred_opt= tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
                   cl0 = cl0, cgin = cgin, clin = clin, Kga = 'individual', k = k, k2 = k2, henry = henry, pKa = pKa, 
@@ -204,9 +204,9 @@ copt = sol['x']
 
 
 # Models for plotting_______________________________________________________________________________________
-kl_fit = float(copt[0])
-k_fit = float(copt[1])
-k2_fit = float(copt[2])
+kl_fit = abs(float(copt[0]))
+k_fit = abs(float(copt[1]))
+k2_fit = abs(float(copt[2]))
 
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'individual' , k = k_fit, k2 = k2_fit, henry = henry, pKa = pKa, 
@@ -240,7 +240,7 @@ plt.xlim(0,0.35)
 plt.ylim(0,0.07)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second)
-plt.savefig('Plots/Experiment '+first+'.'+second+'optimized kl, k2 and k.png', bbox_inches='tight')
+plt.savefig('Plots/Experiment '+first+'.'+second+'logcurve test.png', bbox_inches='tight')
 plt.close()
 
 #table with input paramters
@@ -273,6 +273,6 @@ table_ax.set_fontsize(8)
 plt.title('Experiment '+first+'.'+second)
 
 # Save the figure
-plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'optimized kl, k2 and k.png', bbox_inches='tight')
+plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'logcurve test.png', bbox_inches='tight')
 
 

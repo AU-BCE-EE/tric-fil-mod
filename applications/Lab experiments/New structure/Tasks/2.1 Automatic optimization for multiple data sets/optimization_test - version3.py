@@ -24,9 +24,9 @@ modelresults_dict = {}
 exp_no1 = 4
 exp_no2 = 7
 
-IG_kl = 0.1
-IG_k = 0.1
-IG_k2 = 0.1
+IG_kl = 0.001
+IG_k = 0.001
+IG_k2 = 0.001
 diff_step = 10
     
 for i in [exp_no1,exp_no2]:
@@ -227,7 +227,7 @@ def res_calc(x):
 
 #Finding the solution that gives the least combined deviation between model and experiments
 
-breakpoint()
+
 
 
 #sol = least_squares(res_calc, [IG_kl, IG_k, IG_k2], xtol = 3e-16, ftol = 3e-16, gtol = 3e-16, diff_step = diff_step)
@@ -309,7 +309,7 @@ plt.xlim(0,0.35)
 plt.ylim(0,0.07)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second)
-plt.savefig('Plots/Experiment '+first+'.'+second+'optimized [kl, k, k2], [IG] ['+str(IG_kl)+','+str(IG_k)+','+str(IG_k2)+'].png', bbox_inches='tight')
+plt.savefig('Experiment '+first+'.'+second+'optimized [kl, k, k2], [IG] ['+str(IG_kl)+','+str(IG_k)+','+str(IG_k2)+'].png', bbox_inches='tight')
 plt.close()
 
 
@@ -343,6 +343,6 @@ table_ax.set_fontsize(8)
 plt.title('Experiment '+first+'.'+second)
 
 # Save the figure
-plt.savefig('Plots/Inputs/Input_parameters_optimized [kl, k, k2], [IG] ['+str(IG_kl)+','+str(IG_k)+','+str(IG_k2)+'].png', bbox_inches='tight')
+plt.savefig('Input_parameters_optimized [kl, k, k2], [IG] ['+str(IG_kl)+','+str(IG_k)+','+str(IG_k2)+'].png', bbox_inches='tight')
 
 

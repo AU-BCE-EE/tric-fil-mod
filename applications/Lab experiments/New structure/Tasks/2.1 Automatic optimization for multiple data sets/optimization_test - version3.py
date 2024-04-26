@@ -204,9 +204,9 @@ def res_calc(x):
     
     #Define wat is in each position in the answer array x
 
-    kl = abs(x[0])
-    k = abs(x[1])
-    k2 = abs(x[2])
+    kl = 10**x[0]
+    k = 10**x[1]
+    k2 = 10**x[2]
     
     #Model number 1 + residue calculation
     pred_opt1= tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
@@ -226,7 +226,13 @@ def res_calc(x):
     return r
 
 #Finding the solution that gives the least combined deviation between model and experiments
-sol = least_squares(res_calc, [IG_kl, IG_k, IG_k2], xtol = 3e-16, ftol = 3e-16, gtol = 3e-16, diff_step = diff_step)
+
+breakpoint()
+
+
+#sol = least_squares(res_calc, [IG_kl, IG_k, IG_k2], xtol = 3e-16, ftol = 3e-16, gtol = 3e-16, diff_step = diff_step)
+
+sol = least_squares(res_calc, [-1, -2, -3], xtol = 3e-16, ftol = 3e-16, gtol = 3e-16, diff_step = diff_step)
 
 copt = sol['x']
 

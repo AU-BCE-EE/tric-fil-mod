@@ -232,7 +232,7 @@ def res_calc(x):
 
 #sol = least_squares(res_calc, [IG_kl, IG_k, IG_k2], xtol = 3e-16, ftol = 3e-16, gtol = 3e-16, diff_step = diff_step)
 
-sol = least_squares(res_calc, [-1, -2, -3], xtol = 3e-16, ftol = 3e-16, gtol = 3e-16, diff_step = diff_step)
+sol = least_squares(res_calc, [np.log10(IG_kl), np.log10(IG_k), np.log10(IG_k2)], xtol = 3e-16, ftol = 3e-16, gtol = 3e-16, diff_step = diff_step)
 
 copt = sol['x']
 
@@ -250,20 +250,20 @@ second = str(exp_no1)
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin1, clin = clin, Kga = 'individual' , k = k_fit, k2 = k2_fit, henry = henry, pKa = pKa, 
               pH = pH1, temp = temp, dens_l = dens_l, times = times1, v_res = v_res1, kl=kl_fit, kg='onda', ae=800, recirc = True, counter = True)
-pred1label= first+'.'+second+'.k and Kga optimized model' #label on
+pred1label= 'Optimized model' #label on
 
 
-k=0
+
 times = np.linspace (0,0.35,200) *3600
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin1, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
-              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res1, recirc = True, counter = True)
-pred2label= first+'.'+second+'k=0, onda model' #label on
+              cl0 = cl0, cgin = cgin1, clin = clin, Kga = 'individual', k = IG_k, k2 = IG_k2, henry = henry, pKa = pKa, 
+              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res1, kl = IG_kl,kg='onda', ae = 800, recirc = True, counter = True)
+pred2label= 'initial guesses model' #label on
 
 #Plotting__________________________________________________________________________________________________
 plt.clf()
-plt.plot(times1/3600,c_meas1,label=first+'.'+second+' experimental data')
-plt.plot(times1/3600,c_in1,label='inlet')
+plt.plot(times1/3600,c_meas1,label='measured outlet')
+plt.plot(times1/3600,c_in1,label='measured inlet')
 plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :],color='k',label=pred1label)
 plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :],label=pred2label)
 plt.axvline(x=BT/60,linestyle='-',label=BTlabel) #breakthrough curve
@@ -275,7 +275,7 @@ plt.xlim(0,0.35)
 plt.ylim(0,0.07)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second)
-plt.savefig('Plots/Experiment '+first+'.'+second+'optimized [kl, k, k2], [IG] ['+str(IG_kl)+','+str(IG_k)+','+str(IG_k2)+'].png', bbox_inches='tight')
+plt.savefig('Experiment '+first+'.'+second+'optimized, plotting IG, ['+str(IG_kl)+','+str(IG_k)+','+str(IG_k2)+'].png', bbox_inches='tight')
 plt.close()
 
 #Second experiment___________________________________________________________________________________________________
@@ -284,20 +284,20 @@ second = str(exp_no2)
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin2, clin = clin, Kga = 'individual' , k = k_fit, k2 = k2_fit, henry = henry, pKa = pKa, 
               pH = pH2, temp = temp, dens_l = dens_l, times = times2, v_res = v_res2, kl=kl_fit, kg='onda', ae=800, recirc = True, counter = True)
-pred1label= first+'.'+second+'.k and Kga optimized model' #label on
+pred1label= 'Optimized model' #label on
 
 
-k=0
+
 times = np.linspace (0,0.35,200) *3600
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin2, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
-              pH = pH2, temp = temp, dens_l = dens_l, times = times, v_res = v_res2, recirc = True, counter = True)
-pred2label= first+'.'+second+'k=0, onda model' #label on
+              cl0 = cl0, cgin = cgin2, clin = clin, Kga = 'individual', k = IG_k, k2 = IG_k2, henry = henry, pKa = pKa, 
+              pH = pH2, temp = temp, dens_l = dens_l, times = times, v_res = v_res2, kl = IG_kl, kg = 'onda', ae=800, recirc = True, counter = True)
+pred2label= 'Initial guesses model' #label on
 
 #Plotting__________________________________________________________________________________________________
 plt.clf()
-plt.plot(times2 / 3600,c_meas2,label=first+'.'+second+'.1 experimental data')
-plt.plot(times2 / 3600,c_in2,label='inlet')
+plt.plot(times2 / 3600,c_meas2,label='Meaured outlet')
+plt.plot(times2 / 3600,c_in2,label='Measured inlet')
 plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :],color='k',label=pred1label)
 plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :],label=pred2label)
 plt.axvline(x=BT/60,linestyle='-',label=BTlabel) #breakthrough curve
@@ -309,7 +309,7 @@ plt.xlim(0,0.35)
 plt.ylim(0,0.07)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second)
-plt.savefig('Experiment '+first+'.'+second+'optimized [kl, k, k2], [IG] ['+str(IG_kl)+','+str(IG_k)+','+str(IG_k2)+'].png', bbox_inches='tight')
+plt.savefig('Experiment '+first+'.'+second+'optimized, plotting IG ['+str(IG_kl)+','+str(IG_k)+','+str(IG_k2)+'].png', bbox_inches='tight')
 plt.close()
 
 
@@ -319,7 +319,7 @@ from tabulate import tabulate
 parameters =  [['v_g [m/s]', "{:.4f}".format (pred1['inputs']['v_g'])], ['v_l [m/s]',"{:.6f}".format (pred1['inputs']['v_l'])], ['pH1', "{:.2f}".format(pH1)], ['pH2', "{:.2f}".format(pH2)], ['countercurrent', pred1['inputs']['counter']],
               ['recirculation', pred1['inputs']['recirc']], ['water content [m^3/m^3]', "{:.2f}".format(por_l)], ['porosity [m^3/m^3]', "{:.2f}".format(por_g)], ['temperature [deg. C]', "{:.0f}".format(temp)], ['v_res [m^3/m^2]', "{:.4f}".format(pred1['inputs']['v_res'])],
               ['kl_fit[1/s]',(pred1['pars']['kl'])],['kg_onda[1/s]',"{:.4f}".format(pred1['pars']['kg'])],['ae[m^2/m^3]',pred1['pars']['ae']],['Kga_fit[1/s]',"{:.4f}".format(pred1['pars']['Kga'])], ['Kga_baseline[1/s]',"{:.4f}".format(pred2['pars']['Kga'])],
-              ['k_fit[1/s]', k_fit], ['k & k2 baseline[1/s]', k],['k2_fit',k2_fit]]
+              ['k_fit[1/s]', k_fit], ['k & k2 baseline[1/s]', IG_k],['k2_fit',k2_fit]]
 head = ['parameter', 'value']
 table = tabulate(parameters, headers=head, tablefmt="grid")
 

@@ -135,7 +135,7 @@ def kl_onda (por_g, ssa, temp, dens_l, v_l, ae):
 
 # Rates function
 # Arg order: time, state variable, then arguments
-def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, k2 , Kga, Daw, alpha0, v_res, counter = True, recirc = False):
+def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, alpha0, v_res, k2, counter = True, recirc = False):
 
   # If time-variable concentrations coming in are given, get interpolated values
   if type(clin) is pd.core.frame.DataFrame:
@@ -151,6 +151,10 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, k2 , Kga, D
     cgin = np.interp(t, cgin[0], cgin[1])
   elif not (type(cgin) is int or type(cgin) is float):
     sys.exit('Error: cgin input must be float, integer, numpy array, or a pandas data frame, but is none of these')
+    
+    
+  if type(k2) is str and k2.lower == 'default':
+        k2=k
 
   #breakpoint()
   
@@ -178,8 +182,10 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, k2 , Kga, D
       if v_res > 0:
         clin = mcr / v_res
         rxnr = k * mcr * alpha0 + k2 * mcr * (1-alpha0)
-        #reservoir derivative (g/s) 
-        dmcr = (ccl[oi] - (mcr / v_res) - rxnr) * abs(v_l)
+        #1/s * g/m2 * [] = g/(s*m2)
+        #reservoir derivative (g/(s*m2)) 
+        dmcr = (ccl[oi] - (mcr / v_res)) * abs(v_l) - rxnr
+        #(g/m3 - g/m3) * m/s - g/(s*m2) = g/(s*m2) 
       elif v_res == 0:
           clin = ccl[oi]
       else:
@@ -231,7 +237,7 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, k2 , Kga, D
   return dm
 
 # Model function
-def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, k2, henry, pKa, pH, temp, dens_l, times, kg='onda', kl='onda', ae='onda', v_res = 0, ccr = 0, pres = 1., ssa = 1100, counter = True, recirc = False):
+def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, Kga, henry, pKa, pH, temp, dens_l, times, kg='onda', kl='onda', ae='onda', v_res = 0, k2 = 'default', ccr = 0, pres = 1., ssa = 1100, counter = True, recirc = False):
 
    ## Note that units are defined per 1 m2 filter cross-sectional (total) area 
    ## Below, where 2 sets of units are given this applies to the first case
@@ -345,7 +351,7 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, Kga, k, k2, henry
    # Solve/integrate
    out = solve_ivp(rates, [0, max(times)], y0 = y0, 
                    t_eval = times, 
-                   args = (v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, k2, Kga, Daw, alpha0, v_res, counter, recirc),
+                   args = (v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, alpha0, v_res, k2, counter, recirc),
                    method = 'Radau')
    
    # Extract mass of compound [position, time]

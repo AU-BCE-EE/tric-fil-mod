@@ -137,7 +137,7 @@ dens_l = 1000    # Liquid density (kg/m3)
 # realistic pKa
 pKa = 7.
 
-k=0.01
+k=0
 k2_list = [0.0001, 0.001, 0.005, 0.01, 0.1] 
 
 
@@ -146,7 +146,7 @@ pred_labels = []
 
 for i, k2 in enumerate(k2_list):
     pred = tfmod(L=L, por_g=por_g, por_l=por_l, v_g=v_g, v_l=v_l, nc=nc, cg0=cg0, cl0=cl0,
-                 cgin=cgin, clin=clin, Kga='individual', k=k, k2=k2, henry=henry, pKa=pKa,
+                 cgin=cgin, clin=clin, Kga='individual', k=k, k2 = k2,  henry=henry, pKa=pKa,
                  pH=pH1, temp=temp, dens_l=dens_l, times=times, v_res=v_res, kg = 'onda', kl = 'onda', ae=800, 
                  recirc=True, counter=True)
     
@@ -157,8 +157,8 @@ for i, k2 in enumerate(k2_list):
     
    
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
-              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, ae=800, recirc = True, counter = True)
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, ae=800, k2 = k, recirc = True, counter = True)
 pred1label= first+'.'+second+'.baseline model' #label on
 
 
@@ -175,7 +175,8 @@ plt.xlim(0,0.35)
 plt.ylim(0,0.07)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second)
-plt.savefig('Plots/Experiment '+first+'.'+second+'k loop 1.png', bbox_inches='tight')
+plt.show()
+#plt.savefig('Plots/Experiment '+first+'.'+second+'k loop 1.png', bbox_inches='tight')
 plt.close()
 
 #table with input paramters
@@ -202,7 +203,8 @@ table_ax.set_fontsize(10)
 
 plt.title('Experiment '+first+'.'+second+' baseline')
 
+plt.show()
 # Save the figure
-plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'baseline parameters.png', bbox_inches='tight')
+#plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'baseline parameters.png', bbox_inches='tight')
 
 

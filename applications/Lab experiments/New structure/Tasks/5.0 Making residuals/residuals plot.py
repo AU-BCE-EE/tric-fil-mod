@@ -213,7 +213,7 @@ plt.xlim(0,0.35)
 plt.ylim(0,0.07)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second)
-plt.savefig('Plots/Experiment '+first+'.'+second+'kl loop2.png', bbox_inches='tight')
+plt.savefig('Plots/Experiment '+first+'.'+second+'kl loop3.png', bbox_inches='tight')
 plt.close()
 
 
@@ -233,7 +233,7 @@ plt.legend()
 plt.xlim(0,0.35)
 plt.ylim(-0.05,0.05)
 plt.title('Residuals for experiment '+first+'.'+second)
-plt.savefig('Plots/Experiment '+first+'.'+second+'kl loop2 residuals.png', bbox_inches='tight')
+plt.savefig('Plots/Experiment '+first+'.'+second+'kl loop3 residuals.png', bbox_inches='tight')
 plt.close()
 
 

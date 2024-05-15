@@ -147,7 +147,14 @@ for a in range (2,7):
         C3= ex3['Concentration in g/m^3'][cycle3:cycle3+length+500]
 
         
-        
+        # C1_reset = C1.reset_index(drop=True)
+        # C1_reset = C1_reset.rolling(window=50,center = True).mean()[25:length-25]
+        # C5_reset = C5.reset_index(drop=True)
+        # C5_reset = C5_reset.rolling(window=50,center = True).mean()[25:length-25]
+        # # Now you can perform the calculation
+        # max_relative_error = max(abs(C1_reset - C5_reset)/C5_reset)
+
+        # print(max_relative_error)
         
         c_in=np.mean([C1,C5],axis=0)
 
@@ -178,19 +185,19 @@ for a in range (2,7):
             recirc = True
         
         pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-                      cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
-                      pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = recirc, counter = True)
+                      cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+                      pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, k2=k, recirc = recirc, counter = True)
         pred1label= first+'.'+second+'.1 model' #label on
         
         pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-                      cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
-                      pH = pH2, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = recirc, counter = True)
+                      cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+                      pH = pH2, temp = temp, dens_l = dens_l, times = times, v_res = v_res, k2 = k, recirc = recirc, counter = True)
         pred2label= first+'.'+second+'.2 model' #label on
         
         if not cycle4 == 'NaN':
            pred3 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-                         cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2= k, henry = henry, pKa = pKa, 
-                         pH = pH3, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = recirc, counter = True)
+                         cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+                         pH = pH3, temp = temp, dens_l = dens_l, times = times, v_res = v_res, k2 = k, recirc = recirc, counter = True)
            pred3label= first+'.'+second+'.3 model' #label on 
         
         
@@ -277,6 +284,18 @@ for a in range (2,7):
 
         results.to_csv('..//Output data/model_'+first+'.'+second+'.csv', header = True, index=False)
         
+        #making the residuals
+        
+        
+        pred = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
+                      cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+                      pH = (pH1+pH2)/2, temp = temp, dens_l = dens_l, times = t3norm[cycle3:cycle3+minlen]*3600, v_res = v_res, k2=k, recirc = recirc, counter = True)
+        r = np.transpose(c_out - pred['gas_conc'][nc - 1, :])
+        
+        results = pd.DataFrame({'residuals[g/m3]':r, 'time_residuals[h]':t3norm[cycle3:cycle3+minlen]})
+        
+        results.to_csv('..//Output data/residuals_'+first+'.'+second+'.csv', header = True, index=False)
+        
         #Profiles_________________________________________________________________________________________________
         
         # Gas
@@ -317,6 +336,8 @@ for a in range (2,7):
         plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
         plt.savefig('../Plots/Experiment '+first+'.'+second+' liqprofile.png', bbox_inches='tight')
         plt.close()
+        
+        
         
 
 

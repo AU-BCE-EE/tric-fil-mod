@@ -155,7 +155,7 @@ for i, k in enumerate(k_list):
     preds.append(pred)
     pred_labels.append(label)
     
-   
+k=0   
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
               pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, ae=800, recirc = True, counter = True)
@@ -166,16 +166,17 @@ pred1label= first+'.'+second+'.baseline model' #label on
 #Plotting__________________________________________________________________________________________________
 plt.clf()
 for pred, label in zip(preds, pred_labels):
-    plt.plot(pred['time'] / 3600, pred['gas_conc'][nc - 1, :], label=label)
-plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :],label=pred1label)
-plt.xlabel('Time (h)')
+    plt.plot(pred['time'] / 60, pred['gas_conc'][nc - 1, :], label=label)
+plt.plot(pred1['time'] / 60, pred1['gas_conc'][nc - 1, :],label=pred1label)
+plt.xlabel('Time (min)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
-plt.xlim(0,0.35)
+plt.grid(True)
+plt.xlim(0,20)
 plt.ylim(0,0.07)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second)
-plt.savefig('Plots/Experiment '+first+'.'+second+'k loop 1.png', bbox_inches='tight')
+plt.savefig('Plots/Experiment '+first+'.'+second+'k.png', bbox_inches='tight')
 plt.close()
 
 #table with input paramters

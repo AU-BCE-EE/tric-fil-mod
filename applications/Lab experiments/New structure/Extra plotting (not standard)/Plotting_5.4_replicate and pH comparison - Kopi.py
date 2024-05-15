@@ -51,28 +51,36 @@ por_g = 0.795115372 - por_l
 BT = 14.5*por_g/27.2991
 BTlabel='Theoretical Breakthrough curve)'
 
+# Define y values for the expected inlet curve @40ppm
+expected_inlet = np.full_like(ex7['experimental time (h)']*60, 0.0596)  
 
-plt.plot(ex7['experimental time (h)'],ex7['Moving_Average'],color='y',label='experimaltal pH=5.99')
-plt.plot(ex1['experimental time (h)'],ex1['Moving_Average'],color='c',label='experimaltal pH=7.08')
-plt.plot(ex2['experimental time (h)'],ex2['Moving_Average'],color='k',label='experimaltal pH=7.27')
-plt.plot(ex5['experimental time (h)'],ex5['Moving_Average'],color='b',label='experimaltal pH=7.55')
-plt.plot(ex3['experimental time (h)'],ex3['Moving_Average'],color='r',label='experimaltal pH=7.76')
-plt.plot(ex4['experimental time (h)'],ex4['Moving_Average'],color='m',label='experimaltal pH=8.02')
-plt.plot(model7['model time(h)'],model7['model'],color='y',linestyle='dashed', label='model pH=5.99')
-plt.plot(model1['model time(h)'],model1['model'],color='c',linestyle='dashed', label='model pH=7.08')
-plt.plot(model2['model time(h)'],model2['model'],color='k',linestyle='dashed', label='model pH=7.27')
-plt.plot(model5['model time(h)'],model5['model'],color='b',linestyle='dashed', label='model pH=7.55')
-plt.plot(model3['model time(h)'],model3['model'],color='r',linestyle='dashed', label='model pH=7.76')
-plt.plot(model4['model time(h)'],model4['model'],color='m',linestyle='dashed', label='model pH=8.02')
-plt.axvline(x=BT/60,linestyle='-',label=BTlabel) #breakthrough curve
-plt.axhline(y=0.0596,color='g',label='Expected inlet concentration')
-plt.xlabel('Time (h)')
+# Make the line drop to 0 at x=5, as the oulse is 5min
+expected_inlet[ex7['experimental time (h)']*60 >= 5] = 0
+
+
+
+plt.plot(ex7['experimental time (h)']*60,ex7['Moving_Average'],color='y',label='Measured outlet at pH=5.99')
+plt.plot(ex1['experimental time (h)']*60,ex1['Moving_Average'],color='c',label='Measured outlet at pH=7.08')
+#plt.plot(ex2['experimental time (h)']*60,ex2['Moving_Average'],color='k',label='Measured outlet at pH=7.27')
+plt.plot(ex5['experimental time (h)']*60,ex5['Moving_Average'],color='b',label='Measured outlet at pH=7.55')
+plt.plot(ex3['experimental time (h)']*60,ex3['Moving_Average'],color='r',label='Measured outlet at pH=7.76')
+plt.plot(ex4['experimental time (h)']*60,ex4['Moving_Average'],color='m',label='Measured outlet at pH=8.02')
+plt.plot(model7['model time(h)']*60,model7['model'],color='y',linestyle='dashed', label='Model outlet at pH=5.99')
+plt.plot(model1['model time(h)']*60,model1['model'],color='c',linestyle='dashed', label='Model outlet at pH=7.08')
+#plt.plot(model2['model time(h)']*60,model2['model'],color='k',linestyle='dashed', label='Model outlet at pH=7.27')
+plt.plot(model5['model time(h)']*60,model5['model'],color='b',linestyle='dashed', label='Model outlet at pH=7.55')
+plt.plot(model3['model time(h)']*60,model3['model'],color='r',linestyle='dashed', label='Model outlet at pH=7.76')
+plt.plot(model4['model time(h)']*60,model4['model'],color='m',linestyle='dashed', label='Model outlet at pH=8.02')
+plt.axvline(x=BT,linestyle='-',label=BTlabel) #breakthrough curve
+plt.plot(ex7['experimental time (h)']*60, expected_inlet, color='g', label='Expected inlet concentration')
+plt.xlabel('Time (min)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
-plt.xlim(0,0.35)
+plt.grid(True)
+plt.xlim(0,20)
 plt.ylim(0,0.07)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
-plt.title('pH comparison')
+plt.title('pH comparison, baseline model')
 plt.savefig('..//Plots/Ex 5 pH comparison.png', bbox_inches='tight')
 
 #Compare the two replicates (5.4 and 6.1)_________________________________________

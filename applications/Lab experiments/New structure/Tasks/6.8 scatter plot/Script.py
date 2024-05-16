@@ -246,9 +246,10 @@ for a in range (5,7):
 x = np.linspace(1,16,16)
 
 from tabulate import tabulate
-#parameters = [[str(results_dict['experiment 5.1']['Label'][0]):str(x[1])],[str(results_dict['experiment 5.1']['Label'][1]):x[1]]]
+
+
 parameters = [[label[4:], int(x[i])] for i, label in enumerate(results_dict['experiment 5.1']['Label'])]
-head = ['parameter', 'number in scatterplot']
+head = ['Parameter', 'Parameter # in plot']
 table = tabulate(parameters, headers=head, tablefmt="grid")
 
 # Create a figure and axis
@@ -264,17 +265,17 @@ table_ax = ax.table(cellText=parameters, colLabels=head, loc='center', cellLoc='
 table_ax.auto_set_font_size(False)
 table_ax.set_fontsize(10)
 
-plt.title('Test')
 #plt.show()
 # Save the figure
-plt.savefig('Parameter no explanation.png', bbox_inches='tight')
+plt.savefig('Parameter # explanation.png', bbox_inches='tight')
+plt.close()
 
 
 
 
 y1 = results_dict['experiment 5.1']['ME']
 y3 = results_dict['experiment 5.3']['ME']
-y4 = results_dict['experiment 5.4']['ME']
+#y4 = results_dict['experiment 5.4']['ME']
 y5 = results_dict['experiment 5.5']['ME']
 y2 = results_dict['experiment 5.7']['ME']
 y6 = results_dict['experiment 6.1']['ME']
@@ -283,24 +284,28 @@ y8 = results_dict['experiment 6.3']['ME']
 y9 = results_dict['experiment 6.4']['ME']
 
 
-    
-plt.scatter(x,y1,label='pH 7')
-plt.scatter(x,y3,label='pH 7.75')
-plt.scatter(x,y4,label='pH 8')
-plt.scatter(x,y5,label='pH 7.5')
-plt.scatter(x,y2,label='pH 6')
-plt.scatter(x,y6,label='velocity setting 1')
-plt.scatter(x,y7,label='velocity setting 2')
-plt.scatter(x,y8,label='velocity setting 3')
-plt.scatter(x,y9,label='velocity setting 4')
+plt.clf    
+plt.scatter(x,y1,label='Dataset 1 (pH 7, Vel.Set. 1)')
+plt.scatter(x,y3,label='Dataset 2 (pH 7.75, Vel.Set. 1)')
+#plt.scatter(x,y4,label='Dataset 3 (pH 8, Vel.Set. 1)')
+plt.scatter(x,y5,label='Dataset 4 (pH 7.5, Vel.Set. 1)')
+plt.scatter(x,y2,label='Dataset 5 (pH 6, Vel.Set. 1)')
+plt.scatter(x,y6,label='Dataset 6 (pH 8, Vel.Set. 1)')
+plt.scatter(x,y7,label='Dataset 7 (pH 8, Vel.Set. 2)')
+plt.scatter(x,y8,label='Dataset 8 (pH 8, Vel.Set. 3)')
+plt.scatter(x,y9,label='Dataset 9 (pH 8, Vel.Set. 4)')
+plt.grid(True)
 
-plt.xlabel('parameter no')
-plt.ylabel('model effeciency')
+plt.xlabel('Parameter #')
+plt.ylabel('Model effeciency')
 
 plt.legend()
 # Move legend outside the plot
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.savefig('Scatterplot')
+# Adjust figure size
+plt.gcf().set_size_inches(8, 6)
+
+plt.savefig('Scatterplot without dataset 3', dpi=300, bbox_inches='tight')
 
 
 

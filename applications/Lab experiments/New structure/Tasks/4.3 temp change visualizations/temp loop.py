@@ -153,8 +153,8 @@ for i, temp in enumerate(temp_list):
     Ka298 = 10**(-pKa298)
     DeltaHr = 1470000 #J/mol, from nist: 1470kJ/mol
     R = 8.314463 # gas constant in J/mol/K
-    temp_K = temp + 273.15 
-    KaT = Ka298 * math.exp((DeltaHr / R) * (1/298 - 1/temp_K))
+    temp_K = temp + 273 
+    KaT = Ka298 * math.exp((-DeltaHr / R) * (1/temp_K - 1/298))
 
     pKa = -math.log10(KaT)
     print(pKa)

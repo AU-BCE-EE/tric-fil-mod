@@ -112,23 +112,18 @@ BTlabel='Theoretical Breakthrough curve)'
 
 #Defining inputs for the model______________________________________________________________________
 #Time and inlet concentrations
-#c_in=np.mean([C1,C5],axis=0)
+c_in=np.mean([C1,C5],axis=0)
 
-# cgin = pd.DataFrame({'time': t5*3600, 
-#                      'cgin': c_in})
-
-c_in = [0.0596 if i < 120 else 0 for i in range(220)]
+cgin = pd.DataFrame({'time': t5*3600, 
+                     'cgin': c_in})
 
 clin = 0
 
 # Times for model output in h
-tt = 1
+tt = 0.35
 # Number of time rows
-nt = 220
+nt = 200
 times = np.linspace(0, tt, nt) * 3600
-
-cgin = pd.DataFrame({'time': times, 
-                      'cgin': c_in})
 
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # See notes in tfmod.py for more complete descriptions
@@ -142,65 +137,107 @@ dens_l = 1000    # Liquid density (kg/m3)
 # realistic pKa
 pKa = 7.
 
-k=0
-kl_list = [0.0000001,0.0000005,0.000001,0.000004, 0.000007] 
+
+k_list = [0.0001, 0.001, 0.005, 0.01, 0.1] 
 
 
 preds = []
 pred_labels = []
 
-for i, kl in enumerate(kl_list):
-
-    
+for i, k in enumerate(k_list):
     pred = tfmod(L=L, por_g=por_g, por_l=por_l, v_g=v_g, v_l=v_l, nc=nc, cg0=cg0, cl0=cl0,
-                 cgin=cgin, clin=clin, Kga='individual', k=k, henry=henry, pKa=pKa,
-                 pH=pH1, temp=temp, dens_l=dens_l, times=times, v_res=v_res, kg = 'onda', kl = kl, ae=800, k2=k, 
-                 recirc=True, counter=True)
-    
-    # Removal efficiency
-    RE = (0.0596 - pred['gas_conc'][nc - 1, :][119]) / 0.0596
-    formatted_RE = "{:.3g}".format(RE)
+                 cgin=cgin, clin=clin, Kga='individual', k=k, k2=k, henry=henry, pKa=pKa,
+                 pH=pH1, temp=temp, dens_l=dens_l, times=times, v_res=v_res, kg = 'onda', kl = 'onda', ae=800, 
+                 recirc=False, counter=True)
+    #Mass balance
 
+    m_out_g = np.sum(pred['gas_conc'][nc-1,:]*(v_g*area)*times[1])
+             # g/m3*m3/s *s = g
+
+    m_out_l = np.sum(pred['liq_conc'][nc-1,:]*(v_l*area)*times[1])
+            # g/m3*m3/s *s = g
+    m_in = np.sum(c_in * (v_g*area) * t5[cycle5+1]*3600)
+            # g/m3*m3/s *s = g
+
+    m_dest = m_in - m_out_l - m_out_g
+
+    from tabulate import tabulate
+    # Format values with three significant digits
+    m_out_g_formatted = "{:.3g}".format(m_out_g)
+    m_out_l_formatted = "{:.3g}".format(m_out_l)
+    m_in_formatted = "{:.3g}".format(m_in)
+    m_dest_formatted = "{:.3g}".format(m_dest)
     
-    label = f"kl {kl} m/s model RE {formatted_RE}"
+    # Create table data
+    table_data = [
+        ["m_out_g", m_out_g_formatted],
+        ["m_out_l", m_out_l_formatted],
+        ["m_in", m_in_formatted],
+        ["m_dest", m_dest_formatted]]
+
+
+
+    # Print table
+    table = tabulate(table_data, headers=["Variable", "Value [g]"], tablefmt="grid")
+
+    # Create a figure and axis
+    fig, ax = plt.subplots()
+
+    # Hide the axes
+    ax.axis('off')
+
+    # Plot the table
+    table_ax = ax.table(cellText=table_data, colLabels=["Variable", "Value [g]"], loc='center', cellLoc='center')
+
+    # Adjust font size
+    table_ax.auto_set_font_size(False)
+    table_ax.set_fontsize(10)
+
+    plt.title('k = '+str(k))
+    plt.show()
+    
+    
+    label = f"{first}.{second}.k {k} model"
     
     preds.append(pred)
     pred_labels.append(label)
     
-   
+k=0   
 pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, ae=800, k2 = k, recirc = True, counter = True)
-pred1label= 'Baseline model' #label on
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
+              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, ae=800, recirc = False, counter = True)
+pred1label= first+'.'+second+'.baseline model' #label on
 
-#Removal efficiency
-RE = (0.0596-pred['gas_conc'][nc-1,:][119])/0.0596
-formatted_RE = "{:.3g}".format(RE)
+#Mass balance
 
-#Plotting__________________________________________________________________________________________________
-plt.clf()
-for pred, label in zip(preds, pred_labels):
-    plt.plot(pred['time'] / 3600, pred['gas_conc'][nc - 1, :], label=label)
-plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :],label=pred1label+' RE '+str(formatted_RE))
-plt.xlabel('Time (h)')
-plt.ylabel('Compound conc. (g/m3)')
-plt.legend()
-plt.grid(True)
-plt.xlim(0,1)
-plt.ylim(-0.01,0.07)
-plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
-plt.title('pH 8, velocity setting 1')
-plt.savefig('Plots/Experiment '+first+'.'+second+'kl steady state, k 0.png', bbox_inches='tight')
-plt.close()
+m_out_g = np.sum(pred1['gas_conc'][nc-1,:]*(v_g*area)*times[1])
+         # g/m3*m3/s *s = g
 
-#table with input paramters
-#import module
+m_out_l = np.sum(pred1['liq_conc'][nc-1,:]*(v_l*area)*times[1])
+        # g/m3*m3/s *s = g
+m_in = np.sum(c_in * (v_g*area) * t5[cycle5+1]*3600)
+        # g/m3*m3/s *s = g
+
+m_dest = m_in - m_out_l - m_out_g
+
 from tabulate import tabulate
-parameters = [['v_g', pred1['inputs']['v_g']], ['v_l', pred1['inputs']['v_l']], ['pH1', pH1], ['pH2', pH2], ['pH3', pH3], ['k', k], ['countercurrent', pred1['inputs']['counter']],
-              ['recirculation', pred1['inputs']['recirc']], ['water content', por_l], ['porosity', por_g], ['temperature', temp], 
-              ['v_res', pred1['inputs']['v_res']],['ae',pred1['pars']['ae']],['kg',pred1['pars']['kg']],['kl',pred1['pars']['kl']]]
-head = ['parameter', 'value']
-table = tabulate(parameters, headers=head, tablefmt="grid")
+# Format values with three significant digits
+m_out_g_formatted = "{:.3g}".format(m_out_g)
+m_out_l_formatted = "{:.3g}".format(m_out_l)
+m_in_formatted = "{:.3g}".format(m_in)
+m_dest_formatted = "{:.3g}".format(m_dest)
+
+# Create table data
+table_data = [
+    ["m_out_g", m_out_g_formatted],
+    ["m_out_l", m_out_l_formatted],
+    ["m_in", m_in_formatted],
+    ["m_dest", m_dest_formatted]]
+
+
+
+# Print table
+table = tabulate(table_data, headers=["Variable", "Value [g]"], tablefmt="grid")
 
 # Create a figure and axis
 fig, ax = plt.subplots()
@@ -209,15 +246,58 @@ fig, ax = plt.subplots()
 ax.axis('off')
 
 # Plot the table
-table_ax = ax.table(cellText=parameters, colLabels=head, loc='center', cellLoc='center')
+table_ax = ax.table(cellText=table_data, colLabels=["Variable", "Value [g]"], loc='center', cellLoc='center')
 
 # Adjust font size
 table_ax.auto_set_font_size(False)
 table_ax.set_fontsize(10)
 
-plt.title('Experiment '+first+'.'+second+' baseline')
-
-# Save the figure
-#plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'baseline parameters.png', bbox_inches='tight')
+plt.title('k = '+str(k))
 plt.show()
+
+
+#Plotting__________________________________________________________________________________________________
+plt.clf()
+for pred, label in zip(preds, pred_labels):
+    plt.plot(pred['time'] / 60, pred['gas_conc'][nc - 1, :], label=label)
+plt.plot(pred1['time'] / 60, pred1['gas_conc'][nc - 1, :],label=pred1label)
+plt.xlabel('Time (min)')
+plt.ylabel('Compound conc. (g/m3)')
+plt.legend()
+plt.grid(True)
+plt.xlim(0,20)
+plt.ylim(0,0.07)
+plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
+plt.title('Experiment '+first+'.'+second)
+plt.show()
+#plt.savefig('Plots/Experiment '+first+'.'+second+'k.png', bbox_inches='tight')
+plt.close()
+
+# #table with input paramters
+# #import module
+# from tabulate import tabulate
+# parameters = [['v_g', pred1['inputs']['v_g']], ['v_l', pred1['inputs']['v_l']], ['pH1', pH1], ['pH2', pH2], ['pH3', pH3], ['k', k], ['countercurrent', pred1['inputs']['counter']],
+#               ['recirculation', pred1['inputs']['recirc']], ['water content', por_l], ['porosity', por_g], ['temperature', temp], 
+#               ['v_res', pred1['inputs']['v_res']],['ae',pred1['pars']['ae']],['kg',pred1['pars']['kg']],['kl',pred1['pars']['kl']]]
+# head = ['parameter', 'value']
+# table = tabulate(parameters, headers=head, tablefmt="grid")
+
+# # Create a figure and axis
+# fig, ax = plt.subplots()
+
+# # Hide the axes
+# ax.axis('off')
+
+# # Plot the table
+# table_ax = ax.table(cellText=parameters, colLabels=head, loc='center', cellLoc='center')
+
+# # Adjust font size
+# table_ax.auto_set_font_size(False)
+# table_ax.set_fontsize(10)
+
+# plt.title('Experiment '+first+'.'+second+' baseline')
+
+# # Save the figure
+# #plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'baseline parameters.png', bbox_inches='tight')
+
 

@@ -1,14 +1,15 @@
 # Comparison of numerical Python model to closed-form solution with instant partitioning (equilibrium everywhere)
 
 # Import necessary packages ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-import shutil
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-shutil.copy('../..//Experiment_4/Scripts for plotting/mod_funcs.py', '.')
-from mod_funcs import tfmod 
+sys.path.append("../../../../../..")  # Add the directory containing mod_funcs.py to Python path
+from mod_funcs import tfmod  
+
 
 # Choose experiment~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -32,33 +33,38 @@ henry = (0.39, 3100.)
 temp = 21.       # (degrees C)
 dens_l = 1000    # Liquid density (kg/m3)
 
-#Setting the liquid and gas velocities using the experiment number (second number in the file name)
-if second == '1' or second == '4':
-    v_g = 53/3600
-elif second =='2' or second == '3':
-    v_g = 106/3600
-else: print ('Error in reading "second"')
+no=1
+area = (0.19/2)**2 * 3.14159265
+v_res = vol * 10**(-6) / area
 
-if second == '1' or second == '2':
-    v_l = 0.4/3600
-elif second =='4' or second == '3':
-    v_l = 1.2/3600
-else: print ('Error in reading "second"')
+#Setting the liquid and gas velocities using the experiment number (second number in the file name)
+if no == 1 or no == 4:
+    v_g = 27.2991 / 1000 / 60 / area # gas velocity using calibration curve for mass flow controllers L/min /1000L/m3 / 60 s/min / m2 = m/s
+elif no ==2 or no == 3:
+    v_g = 54.2766 /1000 / 60 /area # gas velocity using calibration curve for mass flow controllers L/min /1000L/m3 / 60 s/min / m2 = m/s
+else: print ('Error in reading "no"')
+
+if no == 1 or no == 2:
+    v_l = 0.390681119/3600 #in m/s, based on pump calibration number 2
+elif no ==4 or no == 3:
+    v_l = 1.253842217/3600 #in m/s, based on pump calibration number 2
+else: print ('Error in reading "no"')
 
 # Porosity and water content definition
-if second == '1':
-    por_l = 0.21
-    por_g = 0.77
-elif second == '2':
-    por_l = 0.23
-    por_g = 0.75
-elif second == '3':
-    por_l = 0.24
-    por_g = 0.74
-elif second == '4':
-    por_l = 0.23
-    por_g = 0.75
-else: print ('Error in reading "second"') 
+#from water content experiments, as well as porosity experiments. Average of three measurements. gas phase is porosity minus water content
+if no == 1:
+    por_l = 0.20498
+    por_g = 0.795115372 - por_l
+elif no == 2:
+    por_l = 0.22494
+    por_g = 0.795115372 - por_l
+elif no == 3:
+    por_l = 0.24056
+    por_g = 0.795115372 - por_l
+elif no == 4:
+    por_l = 0.246304
+    por_g = 0.795115372 - por_l
+else: print ('Error in reading "no"') 
 
 
 k = 0       # Reaction rate (1/s). Small because of inert carrier
@@ -77,16 +83,17 @@ v_res = vol * 10**(-6) / area
 ## Breakthrough time calculated from volume (V=14.5L), Por_g=0.8 and volumetric velocities 25l/min (v_g=53m/h) 
 # . 37.5L/min (v_g=79m/h) and 50 L/min (v_g=106m/h)
 
-BT1 = 14.5*por_g/50
-BT2 = 14.5*por_g/25
-BTlabel='Theoretical Breakthrough curve)'
 
-if second == '1' or second == '4':
+BT1 = 14.5*por_g/54.2766
+BT2 = 14.5*por_g/27.2991
+BTlabel='Theoretical Breakthrough curve'
+
+if no == 1 or no == 4:
     BT = BT2
-elif second =='2' or second == '3':
+elif no ==2 or no == 3:
     BT= BT1
 else: 
-    print ('error in definition of "second". Has to be a string containing the numbers 1,2,3 or 4')
+    print ('error in definition of "no". Has to be a string containing the numbers 1,2,3 or 4')
 
 
 
@@ -117,21 +124,16 @@ t4 = t4norm [cycle4:cycle4+length]
 C4= ex4['mm concentration in g/m^3'][cycle4:cycle4+length]
 
 t2norm = ex2['Time in h'] - ex2['Time in h'][cycle2]
-t2 = t2norm [cycle2:cycle2+length+1500]
-C2= ex2['mm concentration in g/m^3'][cycle2:cycle2+length+1500]
+t2 = t2norm [cycle2:cycle2+length]
+C2= ex2['mm concentration in g/m^3'][cycle2:cycle2+length]
 
 t3norm = ex3['Time in h'] - ex3['Time in h'][cycle3]
-t3 = t3norm [cycle3:cycle3+length+1500]
-C3= ex3['mm concentration in g/m^3'][cycle3:cycle3+length+1500]
-
-
-
-
-    
-
+t3 = t3norm [cycle3:cycle3+length]
+C3= ex3['mm concentration in g/m^3'][cycle3:cycle3+length]
 
 
 #Average of the two inlet profiles for use in the model
+c_out = np.mean([C2,C3],axis = 0)
 
 c_in=np.mean([C1,C4],axis=0)
 
@@ -152,18 +154,20 @@ times = np.linspace(0, tt, nt) * 3600
 
 
 
-pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = True, counter = True)
-pred1label= first+'.'+second+'.1 model' #label on plots
-
-
-
-
 pred2 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
-              pH = pH2, temp = temp, dens_l = dens_l, times = times, v_res = v_res, recirc = True, counter = True)
-pred2label=first+'.'+second+'.2 model'
+              pH = (pH1+pH2)/2, temp = temp, dens_l = dens_l, times = t3*3600, v_res = v_res, recirc = True, counter = True)
+pred2label='Model outlet gas phase'
+
+
+
+# Define y values for the expected inlet curve @5ppm
+expected_inlet = np.full_like(ex1['Time in h']*60, 0.000254)  
+
+# Make the line drop to 0 at x=5, as the oulse is 5min
+expected_inlet[ex1['Time in h']*60 >= 5] = 0
+
+
 
 
 
@@ -172,50 +176,33 @@ pred2label=first+'.'+second+'.2 model'
 
 
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#moving average over 5 data points on each side
+window_size = 11
 
+c_out_plot = pd.DataFrame(c_out).rolling(window=window_size,center = True).mean()
 
-
-
-plt.plot(t2,C2,label=first+'.'+second+'.1 experimental data')
-plt.plot(t3,C3,label=first+'.'+second+'.2 experimental data')
-plt.plot(t1,C1,label='inlet 1')
-plt.plot(t4,C4,label='inlet 2')
-plt.plot(pred1['time'] / 3600, pred1['gas_conc'][0, :],color='k',label=pred1label)
-plt.plot(pred2['time'] / 3600, pred2['gas_conc'][nc - 1, :],color='m',label=pred2label)
-plt.axvline(x=BT/60,linestyle='-',label=BTlabel) #breakthrough curve
-plt.axhline(y=0.000196,color='g',label='Expected inlet concentration')
-plt.xlabel('Time (h)')
+plt.plot(t3 * 60,c_out_plot,label='Measured outlet gas phase',color ='b')
+plt.plot(pred2['time'] / 60, pred2['gas_conc'][nc - 1, :],color='b',linestyle = 'dashed',label=pred2label)
+plt.axvline(x=BT,linestyle='-',label=BTlabel) #breakthrough curve
+plt.plot(ex1['Time in h']*60, expected_inlet, color='g', label='Expected inlet concentration')
+plt.xlabel('Time (min)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
-plt.xlim(0,0.35)
+plt.grid(True)
+plt.xlim(0,20)
 plt.ylim(0)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
-plt.title('Experiment '+first+'.'+second+' mm')
-plt.savefig('..//Plots/Experiment '+first+'.'+second+' mm.png', bbox_inches='tight')
+plt.title('Methyl mercaptan')
+plt.show()
+#plt.savefig('..//Plots/Experiment '+first+'.'+second+' DMS.png', bbox_inches='tight')
 
-#table with input paramters
-#import module
-from tabulate import tabulate
-parameters = [['v_g', pred1['inputs']['v_g']], ['v_l', pred1['inputs']['v_l']], ['pH1', pH1], ['pH2', pH2], ['k', k], ['countercurrent', pred1['inputs']['counter']],
-              ['recirculation', pred1['inputs']['recirc']], ['water content', por_l], ['porosity', por_g], ['temperature', temp], ['v_res', pred1['inputs']['v_res']]]
-head = ['parameter', 'value']
-table = tabulate(parameters, headers=head, tablefmt="grid")
 
-# Create a figure and axis
-fig, ax = plt.subplots()
 
-# Hide the axes
-ax.axis('off')
 
-# Plot the table
-table_ax = ax.table(cellText=parameters, colLabels=head, loc='center', cellLoc='center')
+MAE_baseline = length**-1*np.sum(abs( pred2['gas_conc'][nc-1:]-c_out ))
+c_out_mean = np.mean(c_out)
+ME_baseline = (np.sum((c_out-c_out_mean)**2)-np.sum((pred2['gas_conc'][nc-1:]-c_out)**2))/np.sum((c_out-c_out_mean)**2)
 
-# Adjust font size
-table_ax.auto_set_font_size(False)
-table_ax.set_fontsize(10)
-
-plt.title('Experiment '+first+'.'+second+' mm')
-
-# Save the figure
-plt.savefig('..//Plots/Inputs/Input_parameters_'+first+'.'+second+' mm.png', bbox_inches='tight')
+print('ME '+str(ME_baseline))
+print('MAE '+str(MAE_baseline))
 

@@ -15,9 +15,30 @@ from mod_funcs import tfmod
 #select and define experimental data ______________________________________________
 #selecting the experiment number and loading parameters from the master spreadsheet
 
-vol = 700
-no = 1
-pH = 8
+first = '5'
+second = '4'
+
+#parameters loaded. File name changes depending on experiment no.
+file_path = '../../../Master_spreadsheet.xlsx'
+df = pd.read_excel(file_path, sheet_name = 'Data')
+
+params = df[df['key'] == float(first)+0.1*float(second)]
+
+pH1 = params['pH1'].values[0]
+pH2 = params['pH2'].values[0]
+pH3 = params['pH3'].values[0]
+cycle1 = int(params['cycle1'].values[0])
+cycle2 = int(params['cycle2'].values[0])
+cycle3 = int(params['cycle3'].values[0])
+cycle4 = params['cycle4'].values[0]
+if not pd.isna(cycle4):
+    cycle4=int(cycle4)
+else:
+    cycle4 = 'NaN'
+cycle5 = int(params['cycle5'].values[0])
+length = params['length'].values[0]
+vol = params['volume'].values[0]
+no = params['no'].values[0]
 
 
 #Calculating the cross sectional area, and dividing the volume by it, as required by the model
@@ -55,6 +76,28 @@ else: print ('Error in reading "no"')
 
 
 
+# Inlet concentrations load in from data treatment and definition
+
+ex1 = pd.read_csv('../..//Processed_data/experiment_'+first+'.'+second+'.inlet1.csv', sep = ',')
+
+
+#second inlet profile (last data obtained)
+ex5 = pd.read_csv('../..//Processed_data/experiment_'+first+'.'+second+'.inlet2.csv', sep = ',')
+
+
+
+
+
+# selecting and normalising the time, because all data files are started before the H2S
+# was turned on, and not after a specific time, it all depends on the individual experient. 
+#However the cycle at which the H2S was turned on was written down.
+t1norm = ex1['Time in h'] - ex1['Time in h'][cycle1]
+t1 = t1norm [cycle1:cycle1+length]
+C1= ex1['Concentration in g/m^3'].rolling(window=10,center = True).mean()[cycle1:cycle1+length]
+
+t5norm = ex5['Time in h'] - ex5['Time in h'][cycle5]
+t5 = t5norm [cycle5:cycle5+length]
+C5= ex5['Concentration in g/m^3'].rolling(window=10,center = True).mean()[cycle5:cycle5+length]
 
 
 
@@ -100,7 +143,7 @@ dens_l = 1000    # Liquid density (kg/m3)
 pKa = 7.
 
 k=0
-kl_list = [0.000001, 'onda', 0.000004] 
+kl_list = [0.0000001,0.0000005,0.000001,0.000004, 0.000007] 
 
 
 preds = []
@@ -111,7 +154,7 @@ for i, kl in enumerate(kl_list):
     
     pred = tfmod(L=L, por_g=por_g, por_l=por_l, v_g=v_g, v_l=v_l, nc=nc, cg0=cg0, cl0=cl0,
                  cgin=cgin, clin=clin, Kga='individual', k=k, henry=henry, pKa=pKa,
-                 pH=pH, temp=temp, dens_l=dens_l, times=times, v_res=v_res, kg = 'onda', kl = kl, ae=800, k2=k, 
+                 pH=pH1, temp=temp, dens_l=dens_l, times=times, v_res=v_res, kg = 'onda', kl = kl, ae=800, k2=k, 
                  recirc=True, counter=True)
     
     # Removal efficiency
@@ -119,12 +162,16 @@ for i, kl in enumerate(kl_list):
     formatted_RE = "{:.3g}".format(RE)
 
     
-    label = f"kl {kl} m/s outlet gas phase model"
+    label = f"kl {kl} m/s model RE {formatted_RE}"
     
     preds.append(pred)
     pred_labels.append(label)
     
-
+   
+pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
+              cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, henry = henry, pKa = pKa, 
+              pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, ae=800, k2 = k, recirc = True, counter = True)
+pred1label= 'Baseline model' #label on
 
 #Removal efficiency
 RE = (0.0596-pred['gas_conc'][nc-1,:][119])/0.0596
@@ -134,13 +181,43 @@ formatted_RE = "{:.3g}".format(RE)
 plt.clf()
 for pred, label in zip(preds, pred_labels):
     plt.plot(pred['time'] / 3600, pred['gas_conc'][nc - 1, :], label=label)
+plt.plot(pred1['time'] / 3600, pred1['gas_conc'][nc - 1, :],label=pred1label+' RE '+str(formatted_RE))
 plt.xlabel('Time (h)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
 plt.grid(True)
 plt.xlim(0,1)
-plt.ylim(0,0.07)
+plt.ylim(-0.01,0.07)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('pH 8, velocity setting 1')
-plt.savefig('Plots/Experiment kl steady state, k = 0.png', bbox_inches='tight')
+plt.savefig('Plots/Experiment '+first+'.'+second+'kl steady state, k 0.png', bbox_inches='tight')
 plt.close()
+
+#table with input paramters
+#import module
+from tabulate import tabulate
+parameters = [['v_g', pred1['inputs']['v_g']], ['v_l', pred1['inputs']['v_l']], ['pH1', pH1], ['pH2', pH2], ['pH3', pH3], ['k', k], ['countercurrent', pred1['inputs']['counter']],
+              ['recirculation', pred1['inputs']['recirc']], ['water content', por_l], ['porosity', por_g], ['temperature', temp], 
+              ['v_res', pred1['inputs']['v_res']],['ae',pred1['pars']['ae']],['kg',pred1['pars']['kg']],['kl',pred1['pars']['kl']]]
+head = ['parameter', 'value']
+table = tabulate(parameters, headers=head, tablefmt="grid")
+
+# Create a figure and axis
+fig, ax = plt.subplots()
+
+# Hide the axes
+ax.axis('off')
+
+# Plot the table
+table_ax = ax.table(cellText=parameters, colLabels=head, loc='center', cellLoc='center')
+
+# Adjust font size
+table_ax.auto_set_font_size(False)
+table_ax.set_fontsize(10)
+
+plt.title('Experiment '+first+'.'+second+' baseline')
+
+# Save the figure
+#plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'baseline parameters.png', bbox_inches='tight')
+plt.show()
+

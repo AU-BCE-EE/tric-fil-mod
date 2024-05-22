@@ -5,7 +5,6 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import math
 
 
 # Import model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -20,7 +19,6 @@ from mod_funcs import tfmod
 
 vol = 700
 no = 1
-pH = 8
 
 
 # Times for model output in h
@@ -75,6 +73,7 @@ else: print ('Error in reading "no"')
 
 
 
+
 ## Breakthrough time calculated from volume (V=14.5L), Por_g and flow rate (L/min, from calibration of mass flow controllers)
 
 BT1 = 14.5*por_g/54.2766
@@ -93,7 +92,11 @@ cgin = pd.DataFrame({'time': times,
 
 clin = 0
 
-
+# Times for model output in h
+tt = 0.35
+# Number of time rows
+nt = 200
+times = np.linspace(0, tt, nt) * 3600
 
 # Set model inputs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # See notes in tfmod.py for more complete descriptions
@@ -104,82 +107,45 @@ cl0 = 0          # (g/m3)
 henry = (0.1, 2000.)
 temp = 21.       # (degrees C)
 dens_l = 1000    # Liquid density (kg/m3)
+# realistic pKa
+pKa = 7.
 
-k=0
-temp_list = [10, 21, 30] 
+k = 0
+pH_list = [6,7.5,8] 
 
 
 preds = []
 pred_labels = []
 
-
-# Making the models
-
-for i, temp in enumerate(temp_list):
-    T_K = temp + 273.15
-    
-    pKa = -(-3448.7 / T_K + 47.479 - 7.5227 * np.log(T_K) )
-
-    print(pKa)
+for i, pH in enumerate(pH_list):
     pred = tfmod(L=L, por_g=por_g, por_l=por_l, v_g=v_g, v_l=v_l, nc=nc, cg0=cg0, cl0=cl0,
-                 cgin=cgin, clin=clin, Kga='onda', k=k, k2=k, henry=henry, pKa=pKa,
-                 pH=pH, temp=temp, dens_l=dens_l, times=times, v_res=v_res, 
+                 cgin=cgin, clin=clin, Kga='individual', k=k, k2=k, henry=henry, pKa=pKa,
+                 pH=pH, temp=temp, dens_l=dens_l, times=times, v_res=v_res, kg = 'onda', kl = 'onda', ae=800, 
                  recirc=True, counter=True)
     
-    label = f"Temperature {temp}\u00b0 C outlet gas phase model"
+    label = f"pH = {pH} outlet liquid phase model"
     
     preds.append(pred)
     pred_labels.append(label)
-    
-   
-# pred1 = tfmod(L = L, por_g = por_g, por_l = por_l, v_g = v_g, v_l = v_l, nc = nc, cg0 = cg0, 
-#               cl0 = cl0, cgin = cgin, clin = clin, Kga = 'onda', k = k, k2 = k, henry = henry, pKa = pKa, 
-#               pH = pH1, temp = temp, dens_l = dens_l, times = times, v_res = v_res, ae=800, recirc = True, counter = True)
-# pred1label= first+'.'+second+'.baseline model' #label on
+
 
 
 
 #Plotting__________________________________________________________________________________________________
 plt.clf()
 for pred, label in zip(preds, pred_labels):
-    plt.plot(pred['time'] / 60, pred['gas_conc'][nc - 1, :], label=label)
-#plt.plot(pred1['time'][:176] / 60, pred1['gas_conc'][nc - 1, :],label=pred1label)
+    plt.plot(pred['time'] / 60, pred['liq_conc'][nc - 1, :], label=label)
+#plt.plot(pred1['time'] / 60, pred1['gas_conc'][nc - 1, :],label=pred1label)
 plt.xlabel('Time (min)')
 plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
-plt.xlim(0,20)
-plt.ylim(0,0.07)
 plt.grid(True)
+plt.xlim(0,20)
+plt.ylim(0,2)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
-plt.title('pH 8, velocity settings 1')
-plt.savefig('Plots/Experiment new temp change 2.png', bbox_inches='tight')
+plt.savefig('Plots/Experimental pH liq.png', bbox_inches='tight')
 plt.close()
 
-# #table with input paramters
-# #import module
-# from tabulate import tabulate
-# parameters = [['v_g', pred1['inputs']['v_g']], ['v_l', pred1['inputs']['v_l']], ['pH1', pH1], ['pH2', pH2], ['pH3', pH3], ['k', k], ['countercurrent', pred1['inputs']['counter']],
-#               ['recirculation', pred1['inputs']['recirc']], ['water content', por_l], ['porosity', por_g], ['temperature', temp], 
-#               ['v_res', pred1['inputs']['v_res']],['ae',pred1['pars']['ae']],['kg',pred1['pars']['kg']],['kl',pred1['pars']['kl']]]
-# head = ['parameter', 'value']
-# table = tabulate(parameters, headers=head, tablefmt="grid")
 
-# # Create a figure and axis
-# fig, ax = plt.subplots()
-
-# # Hide the axes
-# ax.axis('off')
-
-# # Plot the table
-# table_ax = ax.table(cellText=parameters, colLabels=head, loc='center', cellLoc='center')
-
-# # Adjust font size
-# table_ax.auto_set_font_size(False)
-# table_ax.set_fontsize(10)
-
-# plt.title('Experiment '+first+'.'+second+' baseline')
-
-# # Save the figure
-# plt.savefig('Plots/Inputs/Input_parameters_'+first+'.'+second+'New baseline parameters.png', bbox_inches='tight')
 
 

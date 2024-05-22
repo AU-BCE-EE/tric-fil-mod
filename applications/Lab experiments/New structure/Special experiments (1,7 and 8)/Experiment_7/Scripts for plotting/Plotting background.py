@@ -59,6 +59,10 @@ C3= ex3['mm concentration in g/m^3'][cycle3:cycle3+length+1500]
 t5 = ex5['Time in h']
 C5= ex5['mm concentration in g/m^3']
 
+df = C5
+background_std = df.std()
+print(background_std)
+
 
 
 
@@ -79,7 +83,8 @@ plt.legend()
 plt.xlim(0)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second+' mm')
-plt.savefig('..//Plots/Background_mm.png', bbox_inches='tight')
+plt.show()
+#plt.savefig('..//Plots/Background_mm.png', bbox_inches='tight')
 
 
 
@@ -103,6 +108,7 @@ C32= ex3['DMS concentration in g/m^3'][cycle3:cycle3+length+1500]
 C52= ex5['DMS concentration in g/m^3']
 
 
+
 # Plots ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -119,7 +125,8 @@ plt.legend()
 plt.xlim(0)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second+' DMS')
-plt.savefig('..//Plots/Background_DMS.png', bbox_inches='tight')
+plt.show()
+#plt.savefig('..//Plots/Background_DMS.png', bbox_inches='tight')
 
 
 
@@ -157,5 +164,6 @@ plt.ylim(-0.00005)
 plt.xlim(0)
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Experiment '+first+'.'+second+' H2S')
-plt.savefig('..//Plots/Background_H2S.png', bbox_inches='tight')
+plt.show()
+#plt.savefig('..//Plots/Background_H2S.png', bbox_inches='tight')
 

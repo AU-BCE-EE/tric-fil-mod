@@ -29,7 +29,7 @@ henry = (0.1, 2000.)
 temp = 21.       # (degrees C)
 dens_l = 1000    # Liquid density (kg/m3)
 
-k = 0        # Reaction rate (1/s). Small because of inert carrier
+k = 0.001        # Reaction rate (1/s). Small because of inert carrier
                  # Reaction could be acid/base that changes the pH
 
 pH = 8.07 
@@ -107,11 +107,10 @@ expected_inlet[ex1['time']*60 >= 120] = 0
 #plotting
 window_size = 11
 
-plt.plot(ex2['time']*60,pd.DataFrame(ex2['concentration']).rolling(window=window_size,center = True).mean(),label='Measured outlet gas phase',color = 'b')
 plt.plot(ex1['time']*60,pd.DataFrame(ex1['concentration']).rolling(window=window_size,center = True).mean(),label='Inlet gas phase')
+plt.plot(ex1['time']*60, expected_inlet, color='g', label='Nominal inlet concentration')
+plt.plot(ex2['time']*60,pd.DataFrame(ex2['concentration']).rolling(window=window_size,center = True).mean(),label='Measured outlet gas phase',color = 'b')
 plt.plot(pred1['time'] / 60, pred1['gas_conc'][nc - 1, :],color='b',linestyle = 'dashed',label=pred1label)
-plt.axvline(x=BT1,linestyle='-',label=BT1label) #breakthrough curve
-plt.plot(ex1['time']*60, expected_inlet, color='g', label='Expected inlet concentration')
 plt.xlim(0,180)
 plt.ylim(0,0.07)
 plt.grid(True)
@@ -120,8 +119,8 @@ plt.ylabel('Compound conc. (g/m3)')
 plt.legend()
 plt.subplot(111).legend(loc='upper center',bbox_to_anchor=(0.5,-0.2)) #Moves legend out of plot
 plt.title('Long experiment')
-#plt.show()
-plt.savefig('Long experiment, k=0.png',bbox_inches='tight')
+plt.show()
+#plt.savefig('Long experiment, k=0.png',bbox_inches='tight')
 
 
 

@@ -57,6 +57,8 @@ def Kga_onda(pH, temp, henry, pKa, pres, ssa, v_g, v_l, por_g, dens_l):
    
     Rtot = 1 / (kg * ae) + Daw / (kl * ae)
     Kga = 1 / Rtot
+    
+
 
     return Kga
 
@@ -237,7 +239,7 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, Kga, Daw, a
   return dm
 
 # Model function
-def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, Kga, henry, pKa, pH, temp, dens_l, times, kg='onda', kl='onda', ae='onda', v_res = 0, k2 = 'default', ccr = 0, pres = 1., ssa = 1100, counter = True, recirc = False):
+def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, Kga, henry, pKa, pH, temp, dens_l, times, kg='onda', kl='onda', ae='onda', v_res = 0, k2 = 'default', ccr = 0, pres = 1., ssa = 1100, typ = 'TBD', counter = True, recirc = False):
 
    ## Note that units are defined per 1 m2 filter cross-sectional (total) area 
    ## Below, where 2 sets of units are given this applies to the first case
@@ -264,6 +266,7 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, Kga, henry, pK
    # count = Boolean for countercurrent flow
    # v_res = volume of a reservoir for the liquid phase (m3 pr m2 cross sectional area), ignored if recirc = False
    #ccr = initial concentration in the reservoir (g/m3)
+   #typ = type of filtermaterial if Kim and Deshusses is used for mass transfer estimation (options:LR, PUF, PR, PCB or PCR for lava rock, polyurethane foam, pall ring, porous ceramic bead and porous ceramic ring)
 
    # Save input arguments for echoing in output
    args_in = locals()
@@ -278,6 +281,7 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, Kga, henry, pK
    
 
    # Caclulate Kga if requested
+   #For ordinary Onda
    if type(Kga) is str and Kga.lower() == 'onda':
       ae=ae_onda(por_g, ssa, temp, dens_l, v_l)
       kg=kg_onda(por_g, ssa, temp, pres, dens_l,v_l,v_g)
@@ -291,7 +295,10 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, Kga, henry, pK
        if type(kl) is str and kl.lower() == 'onda':
            kl=kl_onda(por_g, ssa, temp, dens_l, v_l, ae)
        Kga = individual (pH=pH, temp=temp, henry=henry, pKa=pKa, dens_l=dens_l, kg=kg, kl=kl, ae=ae)
-      
+   elif type(Kga) is str and Kga.lower() == 'kd':
+       sys.path.append('../../..//Alternatives_to_Onda')
+       from Kim_and_Deshusses import Kga_KD
+       Kga = Kga_KD(typ,v_l,v_g,henry,temp,dens_l,pKa,pH)
           
 
    # Retention time (s)

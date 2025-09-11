@@ -11,7 +11,7 @@ from scipy.integrate import solve_ivp
 # Rates function
 # Arg order: time, state variable, then arguments
 #assumes fast pseudo first order reaction with concentration c_cat of the approximately constant reactant
-def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, c_cat, pH, Kga, Daw, alpha0, v_res, k2, temp, henry, pres, pKa, ssa, dens_l, por_l, por_g, counter = True, recirc = False):
+def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, pH, Kga, v_res, k2, temp, henry, pres, pKa, ssa, dens_l, por_l, por_g, counter = True, recirc = False):
 
   # If time-variable concentrations coming in are given, get interpolated values
   if type(clin) is pd.core.frame.DataFrame:
@@ -33,13 +33,14 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, c_cat, pH, 
   elif type(pH) is np.ndarray:
        pH = np.interp(t, pH[0], pH[1])
   elif not (type(pH) is int or type(pH) is float):
-       sys.exit('Error: cgin input must be float, integer, numpy array, or a pandas data frame, but is none of these')
-    
+       sys.exit('Error: pH input must be float, integer, numpy array, or a pandas data frame, but is none of these')
+
+  #print(pH)
   if type(k2) is str and k2.lower == 'default':
         k2=k
+    
 
-  #breakpoint()
-  
+
   
    # Caclulate Kga if requested
    #For ordinary Onda
@@ -90,12 +91,14 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, c_cat, pH, 
      
       #Enhancement factor for chemical reaction
       #Allows chemical reaction to happen in the liquid phase. 
-      Ha = (Dliq*k*c_cat)**0.5/kl #Hatta number, assumes fast reaction (Kasper and Feilberg, 2019)
+      Ha = (Dliq*k)**0.5/kl #Hatta number, assumes fast reaction (Kasper and Feilberg, 2019)
       E = (1+Ha**2)**0.5 # Enhancment factor, assumes fast reaction (Kasper and Feilberg, 2019)
       #breakpoint()
      
-      Rtot = 1 / (kg * ae) + Daw / (kl * ae * E) + Daw / (k * c_cat * por_l) # reference p181 in Seader et al book
+      Rtot = 1 / (kg * ae) + Daw / (kl * ae * E) + Daw / (k * por_l) # reference p181 in Seader et al book
       Kga = 1 / Rtot
+
+
 
   
   # Number of cells (layers) (note integer division)
@@ -177,7 +180,7 @@ def rates(t, mc, v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, c_cat, pH, 
   return dm
 
 # Model function
-def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, c_cat, Kga, henry, pKa, pH, temp, dens_l, times, kg='onda', kl='onda', ae='onda', v_res = 0, k2 = 'default', ccr = 0, pres = 1., ssa = 1100, typ = 'TBD', counter = True, recirc = False):
+def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, Kga, henry, pKa, pH, temp, dens_l, times, kg='onda', kl='onda', ae='onda', v_res = 0, k2 = 'default', ccr = 0, pres = 1., ssa = 1100, typ = 'TBD', counter = True, recirc = False):
 
    ## Note that units are defined per 1 m2 filter cross-sectional (total) area 
    ## Below, where 2 sets of units are given this applies to the first case
@@ -186,8 +189,8 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, c_cat, Kga, he
    # L = total longitudinal length/height of reactor/filter (m)
    # por_g = gas phase porosity (m3/m3 = m3(g)/m3(t) where g = gas and t = total)
    # por_l = liquid phase content (m3/m3 = m3(l)/m3(t) where l = liquid)
-   # v_g = gas flow rate (m3/s) (m3/m2-s = m3(g)/m2(t)-s = superficial velocity in m/s)
-   # v_l = liquid flow rate (m3/s) (m3/m2-s = m3(g)/m2(t)-s = superficial velocity in m/s)
+   # v_g = superficial velocity in m/s
+   # v_l = superficial velocity in m/s
    # nc = number of cells (layers)
    # cg0 = initial compound concentration in gas phase (g/m3 = g(compound)/m3(g))
    # cl0 = initial compound concentration in liquid phase (g/m3)
@@ -222,7 +225,6 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, c_cat, Kga, he
    cg0 = float(cg0)
    cl0 = float(cl0)
    k = float(k)
-   c_cat = float(c_cat)
    pKa = float(pKa)
    temp = float(temp)
    dens_l = float(dens_l)
@@ -263,14 +265,12 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, c_cat, Kga, he
    y0 = np.concatenate([mcg, mcl])
    y0 = np.append (y0, mcr)
 
-   # Ionization fraction
-   alpha0 = 1 / (1 + 10**(pH - pKa))
-   Daw = alpha0 * Kaw
+
    
    # Solve/integrate
    out = solve_ivp(rates, [0, max(times)], y0 = y0, 
                    t_eval = times, 
-                   args = (v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, c_cat, pH, Kga, Daw, alpha0, v_res, k2, temp, henry, pres, pKa, ssa, dens_l, por_l, por_g, counter, recirc),
+                   args = (v_g, v_l, cgin, clin, vol_gas, vol_liq, vol_tot, k, pH, Kga, v_res, k2, temp, henry, pres, pKa, ssa, dens_l, por_l, por_g, counter, recirc),
                    method = 'Radau')
    
    # Extract mass of compound [position, time]
@@ -293,5 +293,5 @@ def tfmod(L, por_g, por_l, v_g, v_l, nc, cg0, cl0, cgin, clin, k, c_cat, Kga, he
    return {'gas_conc': ccgt, 'liq_conc': cclt, 'gas_mass': mcgt, 'liq_mass': mclt, 
            'cell_pos': x, 'time': times, 'tot_mass' : mctot,
            'inputs': args_in, 
-           'pars': {'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga, 'Kaw': Kaw, 'alpha0': alpha0, 'Daw': Daw, 'ae':ae,'kg':kg,'kl':kl}}
+           'pars': {'gas_rt': rt_gas, 'liq_rt': rt_liq, 'Kga': Kga, 'Kaw': Kaw, 'ae':ae,'kg':kg,'kl':kl}}
 
